@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROVNA App</title>
+  
+  <!-- Calcite Components -->
+  <link rel="stylesheet" href="https://unpkg.com/@esri/calcite-components/dist/calcite/calcite.css">
+  <script type="module" src="https://js.arcgis.com/calcite-components/3.1.0/calcite.esm.js"></script>
+
+  <!-- MapLibre GL JS -->
+  <script src="https://unpkg.com/maplibre-gl@^5.5.0/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@^5.5.0/dist/maplibre-gl.css" rel="stylesheet" />
+
+  <!-- Ellipsis JS -->
+  <script src="https://github.com/ellipsis-drive/ellipsis-js-util/releases/download/1.3.3/ellipsis-js-util-1.3.3.js"></script>
+  <script src="https://github.com/ellipsis-drive/mapboxgljs-package/releases/download/3.1.2/mapboxgljs-ellipsis-3.1.2.js"></script>
+
+  <!-- Apache ECharts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.6.0/echarts.min.js"
+          integrity="sha512-XSmbX3mhrD2ix5fXPTRQb2FwK22sRMVQTpBP2ac8hX7Dh/605hA2QDegVWiAvZPiXIxOV0CbkmUjGionDpbCmw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Entry Point JS -->
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <calcite-shell>
+    <calcite-navigation slot="header">
+      <calcite-navigation-logo 
+        slot="logo" 
+        thumbnail="img/izs_marchio_square.png"
+        heading="PROVNA"
+        description="Data viewer">
+      </calcite-navigation-logo>
+    </calcite-navigation>
+
+    <div id="map"></div>
+
+    <calcite-dialog open id="inspector-dialog" slot="dialogs" width="s" scale="s" heading="Inspector" 
+                    placement="top-end" close-disabled drag-enabled kind="brand"
+                    style="--calcite-dialog-offset-y: 65px !important">
+      <calcite-block-group>
+
+        <calcite-block expanded collapsible heading="Year" description="Drag the slider to change year" icon-start="date-time">
+          <calcite-slider id="year_slider" label-handles ticks="1" label-ticks min="2018" max="2024" value="2024" step="1"></calcite-slider>
+        </calcite-block>
+
+        <calcite-block id="analysis_block" collapsible heading="Cluster section" description="Select a cluster clicking on the map" icon-start="cursor-click">
+          <calcite-notice open icon="analysis" kind="brand" width="full" scale="s">
+            <div slot="title">Pred. 55</div>
+            <div slot="message" id="cluster_div">...</div>
+          </calcite-notice>
+        </calcite-block>
+
+        <calcite-block id="chart_block" collapsible heading="Statistics" description="Cluster over time" icon-start="graph-time-series">
+          <calcite-notice open icon="information" kind="brand" width="full" scale="s">
+            <div slot="title">Info</div>
+            <div slot="message" id="clicked_div">...</div>
+          </calcite-notice>
+          <div id="chart-container"></div>
+        </calcite-block>
+
+      </calcite-block-group>
+    </calcite-dialog>
+
+  </calcite-shell>
+</body>
+</html>
