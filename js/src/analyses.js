@@ -35,7 +35,7 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 		
 
 		if (cluster_value != null) { 
-			document.querySelector("#cluster_div").innerHTML = 'Pixel class in '+year+': <strong>'+cluster_value+'</strong>';
+			document.querySelector("#cluster_div").innerHTML = '<strong>'+cluster_value+'</strong>';
 			createEllipsisSelectionRaster(cluster_value, current_timestamp.id);
 			// document.querySelector("#analysis_block").setAttribute("expanded", true);
 			document.querySelector("#chart_block").setAttribute("expanded", true);
