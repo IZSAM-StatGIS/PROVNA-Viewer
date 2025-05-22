@@ -35,9 +35,9 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 		
 
 		if (cluster_value != null) { 
-			document.querySelector("#cluster_div").innerHTML = 'Selected cluster: '+cluster_value+ ' ('+year+')';
+			document.querySelector("#cluster_div").innerHTML = 'Pixel class in '+year+': <strong>'+cluster_value+'</strong>';
 			createEllipsisSelectionRaster(cluster_value, current_timestamp.id);
-			document.querySelector("#analysis_block").setAttribute("expanded", true);
+			// document.querySelector("#analysis_block").setAttribute("expanded", true);
 			document.querySelector("#chart_block").setAttribute("expanded", true);
 			drawChart(data, year);
 			myChart.resize({
@@ -48,7 +48,7 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 			clearPred55Selection();
 			// Aggiorna area di notifica
 			document.querySelector("#cluster_div").innerHTML = '...';
-			document.querySelector("#analysis_block").removeAttribute("expanded");
+			// document.querySelector("#analysis_block").removeAttribute("expanded");
 			document.querySelector("#chart_block").removeAttribute("expanded");
 			document.querySelector("#clicked_div").innerHTML = '...';
             
