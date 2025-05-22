@@ -39,7 +39,7 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 			createEllipsisSelectionRaster(cluster_value, current_timestamp.id);
 			document.querySelector("#analysis_block").setAttribute("expanded", true);
 			document.querySelector("#chart_block").setAttribute("expanded", true);
-			drawChart(data);
+			drawChart(data, year);
 			myChart.resize({
 				width: document.querySelector("#chart_block").offsetWidth - 10,
 				height: 250
