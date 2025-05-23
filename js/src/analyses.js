@@ -51,7 +51,6 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 			// document.querySelector("#analysis_block").removeAttribute("expanded");
 			document.querySelector("#chart_block").removeAttribute("expanded");
 			document.querySelector("#clicked_div").innerHTML = '...';
-            
 			myChart.resize({
 				width:0,
 				height:0
