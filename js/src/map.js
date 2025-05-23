@@ -70,7 +70,7 @@ const initMap = () => {
         analyseRaster(lng, lat, pred55_timestampIds, selected_year);
         
 		document.querySelector("#clicked_div")
-			.innerHTML = "Cluster values at the clicked point ("+lng.toFixed(5).toString() +", "+lat.toFixed(5).toString()+")";
+			.innerHTML = "Cluster values at the clicked location ("+lng.toFixed(5).toString() +", "+lat.toFixed(5).toString()+")";
         
     });
 
