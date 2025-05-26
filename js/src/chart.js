@@ -19,17 +19,27 @@ const drawChart = (data, year) => {
 			name: 'Year',
 			data: years
 		},
-		yAxis: {},
+		yAxis: {
+			name: 'Ecoregion Class',
+			nameLocation: 'center',   // 👈 posizione centrata rispetto all’asse
+			nameRotate: 270,          // 👈 verticale, lettura top-to-bottom
+			nameGap: 35,              // 👈 distanza dalla scala
+			type: 'value',
+			// min: 0,
+  			// max: 55,
+			// interval: 5, // Intervallo tra le tacche
+			axisLabel: { show: false },  // ❌ niente numeri
+			axisTick: { show: false },   // ❌ niente tacche
+			// splitLine: { show: false }   // ❌ niente linee orizzontali
+		},
+
 		series: [{
-			name: 'Cluster',
-			type: 'line',
+			name: 'Ecoregion',
+			type: 'scatter',
 			data: chartData,
             // symbolSize: (value, params) => params.dataIndex === year_index ? 14 : 8,
-			symbolSize: 6, // Dimensione dei punti
-            lineStyle: {
-                width: 4,         // Spessore della linea
-                color: '#39BEBA'  // Colore della linea
-            },
+			symbolSize: 8, // Dimensione dei punti
+			// symbol: 'circle', // Forma dei punti
             itemStyle: {
                 color: '#39BEBA'  // Colore dei punti
 				// color: (params) => params.dataIndex === year_index ? '#007ac2' : '#39BEBA'

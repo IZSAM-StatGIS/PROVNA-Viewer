@@ -1,6 +1,6 @@
-import { analyseRaster, clearPred55Selection } from "./analyses.js";
+import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
 
-let map, marker;
+let map, marker, prediction_pathId = 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b';
 const initMap = () => {
     map = new maplibregl.Map({
 		container: 'map', // container id
@@ -15,9 +15,7 @@ const initMap = () => {
 	map.addControl(new maplibregl.NavigationControl({showCompass: false}), 'top-left');
 	map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
 	// map.addControl(new maplibregl.FullscreenControl(), 'top-right');
-
-    const pred55_timestampIds = [];
-
+    
 	map.on('load', () => {
         // Aggiunge il layer satellitare esri
 	    map.addSource('arcgis-imagery', {
@@ -38,18 +36,7 @@ const initMap = () => {
 			maxzoom: 19
 		});
 
-        // Recupera i timestampId del layer ellipsis e chiama la funzione per aggiungere il layer
-		const pred55_url = "https://api.ellipsis-drive.com/v3/path/be1e61d7-f9c7-488c-985f-cd97f7e7a04b";
-		fetch(pred55_url).then(response => {
-			return response.json();
-		}).then(data => {
-			// console.log('Risposta dal server:', data.raster.timestamps);
-			const responseData = data.raster.timestamps;
-            pred55_timestampIds.push(...responseData.map(item => item));
-            
-            const last_timestampId = responseData[responseData.length - 1].id;
-            createEllipsisRasterLayer(last_timestampId); // Equivalente a createEllipsisRasterLayer();
-		});	
+		fetchPredTimestamps();
 	});
 
    
@@ -67,12 +54,40 @@ const initMap = () => {
 			.setLngLat([lng, lat])
 			.addTo(map);
 		
-        analyseRaster(lng, lat, pred55_timestampIds, selected_year);
+        analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
         
 		document.querySelector("#clicked_div")
 			.innerHTML = "Cluster values at the clicked location ("+lng.toFixed(5).toString() +", "+lat.toFixed(5).toString()+")";
         
     });
+
+	// Fetch per ottenere i timestampId del layer pred
+	let predLayer_timestampIds = [];
+	const fetchPredTimestamps = async () => {
+		
+		// Recupera i timestampId del layer ellipsis e chiama la funzione per aggiungere il layer
+		const pred_url = "https://api.ellipsis-drive.com/v3/path/"+prediction_pathId;
+		// console.log("Fetching timestamps from:", pred_url);
+		fetch(pred_url).then(response => {
+			return response.json();
+		}).then(data => {
+			prediction_pathId = document.querySelector("#pred_combobox").value;
+			// console.log('Risposta dal server:', data.raster.timestamps);
+			predLayer_timestampIds = []; // Reset the array to avoid duplicates
+			const responseData = data.raster.timestamps;
+            predLayer_timestampIds.push(...responseData.map(item => item));
+            
+            const last_timestampId = responseData[responseData.length - 1].id;
+            createEllipsisRasterLayer(last_timestampId);
+
+			if (marker) {
+				const coords = marker.getLngLat();
+				const { lng, lat } = coords;
+				let selected_year = document.querySelector("#year_slider").value.toString();
+				analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
+			}
+		});	
+	}
 
     // Aggiungi il layer di Ellipsis
     // - Se non viene passato un timestampId, lo inizializzo sul default di ellipsis (più recente)
@@ -80,35 +95,50 @@ const initMap = () => {
         
 		timestampId = timestampId || '';
 			
-		if (map.getLayer('pred55')) {
-			map.removeLayer('pred55'); // Rimuovi layer
-			map.removeSource('pred55_source'); // Rimuovi la sorgente
+		if (map.getLayer('predLayer')) {
+			map.removeLayer('predLayer'); // Rimuovi layer
+			map.removeSource('predLayer_source'); // Rimuovi la sorgente
 		}
 			
-		const pred55 = await MapboxgljsEllipsis.AsyncEllipsisRasterLayer({
-			pathId: "be1e61d7-f9c7-488c-985f-cd97f7e7a04b",
-			timestampId: timestampId
+		const predLayer = await MapboxgljsEllipsis.AsyncEllipsisRasterLayer({
+			pathId: prediction_pathId,
+			timestampId: timestampId,
+			zoom: 10
 		});
-		pred55.id = 'pred55'; // Assegna un id al layer
-		pred55.addTo(map);
+
+		predLayer.id = 'predLayer'; // Assegna un id al layer
+		predLayer.addTo(map);
 	};
+
+	// ComboBox change
+	document.querySelector("#pred_combobox").addEventListener("calciteComboboxChange", (e)=>{
+		// console.log(e.target.value);
+		prediction_pathId = e.target.value;
+		let selected_year = document.querySelector("#year_slider").value.toString();
+        let selected_timestampId = predLayer_timestampIds.find(item => item.description === selected_year);
+		
+		clearpredLayerSelection();
+		fetchPredTimestamps();
+
+		
+
+	});
 	
     // Slider change
 	document.querySelector("#year_slider").addEventListener("calciteSliderChange", (e)=>{
 		// console.log(e);
 		let value = e.target.value;
 		let selected_year = value.toString();
-        let selected_timestampId = pred55_timestampIds.find(item => item.description === selected_year);
-        clearPred55Selection()
+        let selected_timestampId = predLayer_timestampIds.find(item => item.description === selected_year);
+        clearpredLayerSelection()
         createEllipsisRasterLayer(selected_timestampId.id);
 		if (marker) {
             const coords = marker.getLngLat();
             const { lng, lat } = coords;
-            // console.log(lng, lat);
-            analyseRaster(lng, lat, pred55_timestampIds, selected_year);
+            analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
         }
 	});
     
 }
 
-export { initMap, map, marker };
+export { initMap, map, marker, prediction_pathId };

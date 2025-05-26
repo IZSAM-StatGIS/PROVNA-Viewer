@@ -1,4 +1,4 @@
-import { map, marker } from './map.js';
+import { map, marker, prediction_pathId } from './map.js';
 import { drawChart, myChart } from './chart.js';
 
 const analyseRaster = (lng, lat, timestamps, year) => {
@@ -11,7 +11,9 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 		coordinates: [lng, lat]
 	};
 
-	const rasterAnalysesUrl = 'https://api.ellipsis-drive.com/v3/path/be1e61d7-f9c7-488c-985f-cd97f7e7a04b/raster/timestamp/analyse';
+
+	const rasterAnalysesUrl = 'https://api.ellipsis-drive.com/v3/path/'+prediction_pathId+'/raster/timestamp/analyse';
+
 
 	const params = new URLSearchParams({
 		timestampIds: JSON.stringify(ids),
@@ -33,7 +35,6 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 		let cluster_value = current_data.result[0].statistics.mean
 		// console.log('Cluster', cluster_value)
 		
-
 		if (cluster_value != null) { 
 			document.querySelector("#cluster_div").innerHTML = '<strong>'+cluster_value+'</strong>';
 			createEllipsisSelectionRaster(cluster_value, current_timestamp.id);
@@ -45,7 +46,7 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 				height: 250
 			});
 		} else {
-			clearPred55Selection();
+			clearpredLayerSelection();
 			// Aggiorna area di notifica
 			document.querySelector("#cluster_div").innerHTML = '...';
 			// document.querySelector("#analysis_block").removeAttribute("expanded");
@@ -67,8 +68,6 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 	});
 }
 
-
-
 // Raster layer
 const createEllipsisSelectionRaster = async (cluster_value, timestampId) => {
 	// Stile client side
@@ -87,28 +86,28 @@ const createEllipsisSelectionRaster = async (cluster_value, timestampId) => {
 		method: "v2",
 	};
 							
-	clearPred55Selection();
+	clearpredLayerSelection();
 					
-	const provna55_sel = await MapboxgljsEllipsis.AsyncEllipsisRasterLayer({
-		pathId: "be1e61d7-f9c7-488c-985f-cd97f7e7a04b",
+	const provnaSel = await MapboxgljsEllipsis.AsyncEllipsisRasterLayer({
+		pathId: prediction_pathId,
 		timestampId: timestampId,
 		style: selection_style
 	});
-	provna55_sel.id = 'pred55_selection';
-	provna55_sel.addTo(map);
-	map.setPaintProperty('pred55', 'raster-opacity', 0.55);
+	provnaSel.id = 'predLayer_selection';
+	provnaSel.addTo(map);
+	map.setPaintProperty('predLayer', 'raster-opacity', 0.45);
 };
 
 
-const clearPred55Selection = () => {
-	if (map.getLayer('pred55_selection')) {
+const clearpredLayerSelection = () => {
+	if (map.getLayer('predLayer_selection')) {
 		// Rimuovi layer
-		map.removeLayer('pred55_selection');
+		map.removeLayer('predLayer_selection');
 		// Rimuovi la sorgente
-		map.removeSource('pred55_selection_source');
-		// Ripristina opacità pred55
-		map.setPaintProperty('pred55', 'raster-opacity', 1);
+		map.removeSource('predLayer_selection_source');
+		// Ripristina opacità predLayer
+		map.setPaintProperty('predLayer', 'raster-opacity', 1);
 	}
 }
 
-export { analyseRaster, clearPred55Selection };
+export { analyseRaster, clearpredLayerSelection };

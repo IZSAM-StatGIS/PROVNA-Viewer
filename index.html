@@ -46,7 +46,13 @@
                     style="--calcite-dialog-offset-y: 65px !important">
       <calcite-block-group>
 
-        <calcite-block expanded collapsible heading="Year" description="Drag the slider to change year" icon-start="date-time">
+        <calcite-block expanded collapsible heading="Image/Year" description="Select the image and drag the slider to change year" icon-start="image-collection-explorer">
+
+          <calcite-combobox clear-disabled selection-mode="single-persist" id="pred_combobox" scale="m" width="full">
+            <calcite-combobox-item selected value="be1e61d7-f9c7-488c-985f-cd97f7e7a04b" heading="Pred 55"></calcite-combobox-item>
+            <calcite-combobox-item value="1d215c20-45e1-4e9f-b9d3-df66134586b3" heading="Pred 1600"></calcite-combobox-item>
+          </calcite-combobox>
+
           <calcite-slider id="year_slider" label-handles ticks="1" label-ticks min="2018" max="2024" value="2024" step="1"></calcite-slider>
         </calcite-block>
  
@@ -54,7 +60,7 @@
                       description="Click on the map to view the point's cluster and a chart of its values over time" 
                       icon-start="raster-analysis">
 
-          <calcite-block-section expanded icon-start="classify-pixels" text="Cluster class">
+          <calcite-block-section expanded icon-start="classify-pixels" text="Ecoregion class">
             <calcite-notice open kind="brand" width="full" scale="l">
               <div slot="title" id="cluster_div">...</div>
               <!-- div slot="message">Value on a 55 clusters classification</div -->
