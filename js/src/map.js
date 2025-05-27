@@ -14,7 +14,6 @@ const initMap = () => {
 	});
 	map.addControl(new maplibregl.NavigationControl({showCompass: false}), 'top-left');
 	map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
-	// map.addControl(new maplibregl.FullscreenControl(), 'top-right');
     
 	map.on('load', () => {
         // Aggiunge il layer satellitare esri
@@ -35,20 +34,37 @@ const initMap = () => {
 			minzoom: 0,
 			maxzoom: 19
 		});
-
+		
+		// Vector layer
+		const boundaries = new MapboxgljsEllipsis.EllipsisVectorLayer({
+			pathId: '0347e311-9427-4891-9087-20a57cb24d5e',
+			id: 'boundaries',
+			filter: [
+			"any",
+				["==", ["get", "country_co"], "MO"],
+				["==", ["get", "country_co"], "WI"],
+				["==", ["get", "country_co"], "AG"],
+				["==", ["get", "country_co"], "MR"],
+				["==", ["get", "country_co"], "LY"],
+				["==", ["get", "country_co"], "TS"],
+				["==", ["get", "country_co"], "EG"],
+			],
+		})
+		
+		boundaries.addTo(map)		
+		
 		fetchPredTimestamps();
-	});
 
+	});
    
     map.on('click', (e) => {
+
         const { lng, lat } = e.lngLat;
         let selected_year = document.querySelector("#year_slider").value;
-
         // Se esiste un marker, lo rimuove
 		if (marker) {
 			marker.remove();
 		}
-
 		// Crea un nuovo marker e lo aggiunge alla mappa
 		marker = new maplibregl.Marker({ color: '#39BEBA' })
 			.setLngLat([lng, lat])
@@ -58,6 +74,7 @@ const initMap = () => {
         
 		document.querySelector("#clicked_div")
 			.innerHTML = "Cluster values at the clicked location ("+lng.toFixed(5).toString() +", "+lat.toFixed(5).toString()+")";
+
         
     });
 
@@ -87,6 +104,7 @@ const initMap = () => {
 				analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
 			}
 		});	
+
 	}
 
     // Aggiungi il layer di Ellipsis
@@ -99,6 +117,11 @@ const initMap = () => {
 			map.removeLayer('predLayer'); // Rimuovi layer
 			map.removeSource('predLayer_source'); // Rimuovi la sorgente
 		}
+
+		if (map.getLayer('boundaries')) {
+			map.removeLayer('boundaries'); // Rimuovi layer
+			map.removeSource('boundaries_source'); // Rimuovi la sorgente
+		}
 			
 		const predLayer = await MapboxgljsEllipsis.AsyncEllipsisRasterLayer({
 			pathId: prediction_pathId,
@@ -108,6 +131,16 @@ const initMap = () => {
 
 		predLayer.id = 'predLayer'; // Assegna un id al layer
 		predLayer.addTo(map);
+
+		// 🚀 sposta in cima i boundaries
+		const layersOnTheMap = map.getStyle().layers;
+		layersOnTheMap
+		.filter(layer => layer.id.startsWith('boundaries_'))  
+		.forEach(layer => {
+			// console.log("Spostando layer:", layer.id);
+			map.moveLayer(layer.id);  
+		});
+
 	};
 
 	// ComboBox change
@@ -119,9 +152,6 @@ const initMap = () => {
 		
 		clearpredLayerSelection();
 		fetchPredTimestamps();
-
-		
-
 	});
 	
     // Slider change

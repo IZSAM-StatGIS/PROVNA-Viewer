@@ -96,6 +96,15 @@ const createEllipsisSelectionRaster = async (cluster_value, timestampId) => {
 	provnaSel.id = 'predLayer_selection';
 	provnaSel.addTo(map);
 	map.setPaintProperty('predLayer', 'raster-opacity', 0.45);
+
+	// 🚀 sposta in cima i boundaries
+		const layersOnTheMap = map.getStyle().layers;
+		layersOnTheMap
+		.filter(layer => layer.id.startsWith('boundaries_'))  
+		.forEach(layer => {
+			// console.log("Spostando layer:", layer.id);
+			map.moveLayer(layer.id);  
+		});
 };
 
 
