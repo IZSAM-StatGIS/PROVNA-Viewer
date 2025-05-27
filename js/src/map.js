@@ -9,13 +9,16 @@ const initMap = () => {
 		style: {
 			version: 8,
 			sources: {},
-			layers: []
-		}
+			layers: [],
+			// glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=AlNInvvaWSvJjPJR6yim'
+		},
+		
 	});
 	map.addControl(new maplibregl.NavigationControl({showCompass: false}), 'top-left');
 	map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
     
 	map.on('load', () => {
+
         // Aggiunge il layer satellitare esri
 	    map.addSource('arcgis-imagery', {
             type: 'raster',
@@ -34,11 +37,25 @@ const initMap = () => {
 			minzoom: 0,
 			maxzoom: 19
 		});
+
+		map.addSource('osm-basemap', {
+			type: 'raster',
+			tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
+			tileSize: 256,
+			attribution: '© OpenStreetMap contributors'
+		});
+		map.addLayer({
+			id: 'osm-basemap-layer',
+			type: 'raster',
+			source: 'osm-basemap',
+			layout: { visibility: 'none' } // inizialmente nascosto
+		});
 		
 		// Vector layer
 		const boundaries = new MapboxgljsEllipsis.EllipsisVectorLayer({
 			pathId: '0347e311-9427-4891-9087-20a57cb24d5e',
 			id: 'boundaries',
+			style: 'a1c6ef13-7cf1-4ecf-97fb-f8f28f6dcbd4',
 			filter: [
 			"any",
 				["==", ["get", "country_co"], "MO"],
@@ -51,7 +68,7 @@ const initMap = () => {
 			],
 		})
 		
-		boundaries.addTo(map)		
+		boundaries.addTo(map)	
 		
 		fetchPredTimestamps();
 
@@ -131,6 +148,7 @@ const initMap = () => {
 
 		predLayer.id = 'predLayer'; // Assegna un id al layer
 		predLayer.addTo(map);
+		map.setPaintProperty('predLayer', 'raster-opacity', document.querySelector("#pred_opacity_slider").value*0.01);
 
 		// 🚀 sposta in cima i boundaries
 		const layersOnTheMap = map.getStyle().layers;
@@ -142,6 +160,23 @@ const initMap = () => {
 		});
 
 	};
+
+	// Basemap toggler
+	document.querySelector("#basemap_toggler").addEventListener("calciteRadioButtonChange", (e) => {
+
+		// let selectedBasemap = e.target.value;
+
+		const esriVisible = map.getLayoutProperty('arcgis-imagery-layer', 'visibility') !== 'none';
+		map.setLayoutProperty('arcgis-imagery-layer', 'visibility', esriVisible ? 'none' : 'visible');
+		map.setLayoutProperty('osm-basemap-layer', 'visibility', esriVisible ? 'visible' : 'none');
+	});
+
+	// Opacity slider
+	document.querySelector("#pred_opacity_slider").addEventListener("calciteSliderChange", (e) => {
+		const opacity_value = e.target.value;
+		map.setPaintProperty('predLayer', 'raster-opacity', opacity_value*0.01);
+	});
+
 
 	// ComboBox change
 	document.querySelector("#pred_combobox").addEventListener("calciteComboboxChange", (e)=>{

@@ -43,7 +43,7 @@
 
     <calcite-dialog open id="inspector-dialog" slot="dialogs" width="s" scale="s" heading="Inspect" 
                     placement="top-end" close-disabled drag-enabled kind="brand"
-                    style="--calcite-dialog-offset-y: 65px !important">
+                    style="--calcite-dialog-offset-y: 50px !important">
       <calcite-block-group>
 
         <calcite-block expanded collapsible heading="Image/Year" description="Select the image and drag the slider to change year" icon-start="image-collection-explorer">
@@ -63,7 +63,6 @@
           <calcite-block-section expanded icon-start="classify-pixels" text="Ecoregion class">
             <calcite-notice open kind="brand" width="full" scale="l">
               <div slot="title" id="cluster_div">...</div>
-              <!-- div slot="message">Value on a 55 clusters classification</div -->
             </calcite-notice>
           </calcite-block-section>
 
@@ -78,6 +77,29 @@
         </calcite-block>
 
       </calcite-block-group>
+    </calcite-dialog>
+
+    <calcite-dialog open id="layer-dialog" slot="dialogs" width="s" scale="s" heading="Layer management" 
+                    placement="top-start" close-disabled drag-enabled kind="brand"
+                    style="--calcite-dialog-offset-y: 50px !important; --calcite-dialog-offset-x: 25px !important; --calcite-dialog-size-x: 300px !important">
+
+      <calcite-block collapsible heading="Basemap" description="Change the basemap" icon-start="basemap">
+        <calcite-radio-button-group id="basemap_toggler" name="basemap_toggler" layout="vertical" scale="l">
+          <calcite-label layout="inline">
+            <calcite-radio-button value="sat" checked></calcite-radio-button>
+              Satellite
+            </calcite-label>
+            <calcite-label layout="inline">
+              <calcite-radio-button value="osm"></calcite-radio-button>
+              OpenStreetMap
+            </calcite-label>
+          </calcite-radio-button-group>
+      </calcite-block>
+
+      <calcite-block expanded collapsible heading="Ecoregions" description="Regulate layer transparency" icon-start="contrast">
+        <calcite-slider id="pred_opacity_slider" label-handles ticks="25" label-ticks min="0" max="100" value="75" step="1"></calcite-slider>        
+      </calcite-block>
+
     </calcite-dialog>
 
   </calcite-shell>
