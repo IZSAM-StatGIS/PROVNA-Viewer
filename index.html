@@ -96,8 +96,13 @@
           </calcite-radio-button-group>
       </calcite-block>
 
-      <calcite-block expanded collapsible heading="Ecoregions" description="Regulate layer transparency" icon-start="contrast">
-        <calcite-slider id="pred_opacity_slider" label-handles ticks="25" label-ticks min="0" max="100" value="75" step="1"></calcite-slider>        
+      <calcite-block expanded collapsible heading="Ecoregions" description="Layers transparency adjustment" icon-start="contrast">
+        <calcite-block-section expanded icon-start="image-layer" text="Layer">
+          <calcite-slider id="pred_opacity_slider" label-handles ticks="25" label-ticks min="0" max="100" value="75" step="1"></calcite-slider>  
+        </calcite-block-section>     
+        <calcite-block-section expanded icon-start="layer" text="Selected class">
+          <calcite-slider id="pred_sel_opacity_slider" label-handles ticks="25" label-ticks min="0" max="100" value="100" step="1" disabled></calcite-slider>  
+        </calcite-block-section> 
       </calcite-block>
 
     </calcite-dialog>

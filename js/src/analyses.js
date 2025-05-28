@@ -95,7 +95,10 @@ const createEllipsisSelectionRaster = async (cluster_value, timestampId) => {
 	});
 	provnaSel.id = 'predLayer_selection';
 	provnaSel.addTo(map);
-	// map.setPaintProperty('predLayer', 'raster-opacity', 0.45);
+	
+	// Sblocca lo slider di opacità e riporta l'opacità del layer a 1
+	document.querySelector("#pred_sel_opacity_slider").removeAttribute("disabled");
+	document.querySelector("#pred_sel_opacity_slider").value = 100;
 
 	// 🚀 sposta in cima i boundaries
 		const layersOnTheMap = map.getStyle().layers;
@@ -114,6 +117,8 @@ const clearpredLayerSelection = () => {
 		map.removeLayer('predLayer_selection');
 		// Rimuovi la sorgente
 		map.removeSource('predLayer_selection_source');
+		// Blocca lo slider di opacità
+		document.querySelector("#pred_sel_opacity_slider").setAttribute("disabled", true);
 		// Ripristina opacità predLayer
 		// map.setPaintProperty('predLayer', 'raster-opacity', 1);
 	}

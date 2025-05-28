@@ -55,6 +55,7 @@ const initMap = () => {
 		const boundaries = new MapboxgljsEllipsis.EllipsisVectorLayer({
 			pathId: '0347e311-9427-4891-9087-20a57cb24d5e',
 			id: 'boundaries',
+			zoom: 6,
 			style: 'a1c6ef13-7cf1-4ecf-97fb-f8f28f6dcbd4',
 			filter: [
 			"any",
@@ -175,6 +176,12 @@ const initMap = () => {
 	document.querySelector("#pred_opacity_slider").addEventListener("calciteSliderChange", (e) => {
 		const opacity_value = e.target.value;
 		map.setPaintProperty('predLayer', 'raster-opacity', opacity_value*0.01);
+	});
+
+	// Opacity slider
+	document.querySelector("#pred_sel_opacity_slider").addEventListener("calciteSliderChange", (e) => {
+		const opacity_value = e.target.value;
+		map.setPaintProperty('predLayer_selection', 'raster-opacity', opacity_value*0.01);
 	});
 
 
