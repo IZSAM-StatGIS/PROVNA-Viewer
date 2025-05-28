@@ -16,6 +16,12 @@ const initMap = () => {
 	});
 	map.addControl(new maplibregl.NavigationControl({showCompass: false}), 'top-left');
 	map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+
+	// disable map rotation using right click + drag
+    map.dragRotate.disable();
+
+    // disable map rotation using keyboard
+    map.keyboard.disable();
     
 	map.on('load', () => {
 
