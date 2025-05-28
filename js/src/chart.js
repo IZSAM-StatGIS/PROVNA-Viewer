@@ -45,9 +45,9 @@ const drawChart = (data, year) => {
 		},
 		yAxis: {
 			name: 'Ecoregion Class',
-			nameLocation: 'center',   // 👈 posizione centrata rispetto all’asse
-			nameRotate: 270,          // 👈 verticale, lettura top-to-bottom
-			nameGap: 35,              // 👈 distanza dalla scala
+			nameLocation: 'center',   	// 👈 posizione centrata rispetto all’asse
+			nameRotate: 90,          	// 👈 verticale, lettura top-to-bottom
+			nameGap: 25,              	// 👈 distanza dalla scala
 			type: 'value',
 			// min: 0,
   			// max: 55,
