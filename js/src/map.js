@@ -38,6 +38,28 @@ const initMap = () => {
 			maxzoom: 19
 		});
 
+		// Aggiunge le label esri
+		/*
+	    map.addSource('arcgis-labels', {
+            type: 'raster',
+            tiles: [
+                'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
+            ],
+            tileSize: 256,
+            attribution:
+                'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, etc.'
+		});
+
+		map.addLayer({
+		    id: 'arcgis-labels-layer',
+			type: 'raster',
+			source: 'arcgis-labels',
+			minzoom: 0,
+			maxzoom: 19
+		});
+		*/
+
+		// Aggiunge il layer OSM
 		map.addSource('osm-basemap', {
 			type: 'raster',
 			tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
@@ -55,8 +77,8 @@ const initMap = () => {
 		const boundaries = new MapboxgljsEllipsis.EllipsisVectorLayer({
 			pathId: '0347e311-9427-4891-9087-20a57cb24d5e',
 			id: 'boundaries',
-			zoom: 6,
-			style: 'a1c6ef13-7cf1-4ecf-97fb-f8f28f6dcbd4',
+			onlyTiles: true,
+			// style: 'a1c6ef13-7cf1-4ecf-97fb-f8f28f6dcbd4',
 			filter: [
 			"any",
 				["==", ["get", "country_co"], "MO"],
@@ -166,7 +188,6 @@ const initMap = () => {
 	document.querySelector("#basemap_toggler").addEventListener("calciteRadioButtonChange", (e) => {
 
 		// let selectedBasemap = e.target.value;
-
 		const esriVisible = map.getLayoutProperty('arcgis-imagery-layer', 'visibility') !== 'none';
 		map.setLayoutProperty('arcgis-imagery-layer', 'visibility', esriVisible ? 'none' : 'visible');
 		map.setLayoutProperty('osm-basemap-layer', 'visibility', esriVisible ? 'visible' : 'none');
