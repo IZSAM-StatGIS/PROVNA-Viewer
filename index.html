@@ -41,7 +41,7 @@
 
     <div id="map"></div>
 
-    <calcite-dialog open id="inspector-dialog" slot="dialogs" width="s" scale="s" heading="Inspect" 
+    <calcite-dialog open id="inspector-dialog" slot="dialogs" width="s" scale="s" heading="Data inspector" 
                     placement="top-end" close-disabled drag-enabled kind="brand"
                     style="--calcite-dialog-offset-y: 50px !important">
       <calcite-block-group>
@@ -96,7 +96,7 @@
           </calcite-radio-button-group>
       </calcite-block>
 
-      <calcite-block expanded collapsible heading="Ecoregions" description="Layers transparency adjustment" icon-start="contrast">
+      <calcite-block expanded collapsible heading="Ecoregions" description="Layers transparency % adjustment" icon-start="contrast">
         <calcite-block-section expanded icon-start="image-layer" text="Layer">
           <calcite-slider id="pred_opacity_slider" label-handles ticks="25" label-ticks min="0" max="100" value="75" step="1"></calcite-slider>  
         </calcite-block-section>     
