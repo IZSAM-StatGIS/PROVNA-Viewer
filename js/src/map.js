@@ -25,6 +25,14 @@ const initMap = () => {
     
 	map.on('load', () => {
 
+		map.fitBounds([
+			[-38.771325000611114, -0.01637782719676295], // Southwest corner
+			[67.96414281237787, 42.679722632494475]      // Northeast corner
+		]);
+
+
+
+
         // Aggiunge il layer satellitare esri
 	    map.addSource('arcgis-imagery', {
             type: 'raster',
