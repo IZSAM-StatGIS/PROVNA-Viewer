@@ -30,9 +30,6 @@ const initMap = () => {
 			[67.96414281237787, 42.679722632494475]      // Northeast corner
 		]);
 
-
-
-
         // Aggiunge il layer satellitare esri
 	    map.addSource('arcgis-imagery', {
             type: 'raster',
@@ -84,6 +81,20 @@ const initMap = () => {
 			id: 'osm-basemap-layer',
 			type: 'raster',
 			source: 'osm-basemap',
+			layout: { visibility: 'none' } // inizialmente nascosto
+		});
+
+		// Aggiunge il layer OSM
+		map.addSource('dark-matter', {
+			type: 'raster',
+			tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'],
+			tileSize: 256,
+			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+		});
+		map.addLayer({
+			id: 'dark-basemap-layer',
+			type: 'raster',
+			source: 'dark-matter',
 			layout: { visibility: 'none' } // inizialmente nascosto
 		});
 		
@@ -207,10 +218,24 @@ const initMap = () => {
 	// Basemap toggler
 	document.querySelector("#basemap_toggler").addEventListener("calciteRadioButtonChange", (e) => {
 
-		// let selectedBasemap = e.target.value;
-		const esriVisible = map.getLayoutProperty('arcgis-imagery-layer', 'visibility') !== 'none';
+		let selectedBasemap = e.target.value;
+
+		if (selectedBasemap === 'sat') {
+			map.setLayoutProperty('arcgis-imagery-layer', 'visibility', 'visible');
+			map.setLayoutProperty('osm-basemap-layer', 'visibility', 'none');
+			map.setLayoutProperty('dark-basemap-layer', 'visibility', 'none');
+		} else if (selectedBasemap === 'osm') {
+			map.setLayoutProperty('arcgis-imagery-layer', 'visibility', 'none');
+			map.setLayoutProperty('osm-basemap-layer', 'visibility', 'visible');
+			map.setLayoutProperty('dark-basemap-layer', 'visibility', 'none');
+		} else if (selectedBasemap === 'dark') {
+			map.setLayoutProperty('arcgis-imagery-layer', 'visibility', 'none');
+			map.setLayoutProperty('osm-basemap-layer', 'visibility', 'none');
+			map.setLayoutProperty('dark-basemap-layer', 'visibility', 'visible');
+		}
+		/*const esriVisible = map.getLayoutProperty('arcgis-imagery-layer', 'visibility') !== 'none';
 		map.setLayoutProperty('arcgis-imagery-layer', 'visibility', esriVisible ? 'none' : 'visible');
-		map.setLayoutProperty('osm-basemap-layer', 'visibility', esriVisible ? 'visible' : 'none');
+		map.setLayoutProperty('osm-basemap-layer', 'visibility', esriVisible ? 'visible' : 'none');*/
 	});
 
 	// Opacity slider
