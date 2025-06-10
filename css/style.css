@@ -8,3 +8,11 @@
 html, body {
   --calcite-color-brand: #39BEBA
 }
+
+#mouse_coordinates {
+  display: flex;
+  justify-content: center; /* centra orizzontalmente */
+  align-items: center;     /* centra verticalmente */
+  height: 100%;           /* o qualsiasi altezza tu voglia */
+  
+}
