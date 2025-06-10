@@ -135,7 +135,7 @@ const initMap = () => {
 	map.on('mousemove', (e) => {
 		let {lng, lat} = e.lngLat.wrap();
 		// console.log("Mouse coordinates:", lng, lat);
-        document.getElementById('mouse_coordinates').innerHTML = `Mouse coordinates: ${lng.toFixed(5)}, ${lat.toFixed(5)}`;
+        document.getElementById('mouse_coordinates').innerHTML = `Mouse position: ${lng.toFixed(5)}, ${lat.toFixed(5)}`;
     });
 
 	// Fetch per ottenere i timestampId del layer pred
