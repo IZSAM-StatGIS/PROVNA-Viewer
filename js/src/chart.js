@@ -62,7 +62,7 @@ const drawChart = (data, year) => {
 			type: 'scatter',
 			data: chartData,
             // symbolSize: (value, params) => params.dataIndex === year_index ? 14 : 8,
-			symbolSize: 8, // Dimensione dei punti
+			symbolSize: 24, // Dimensione dei punti
 			// symbol: 'circle', // Forma dei punti
             itemStyle: {
                 color: (params) => {
