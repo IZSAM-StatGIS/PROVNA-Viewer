@@ -13,6 +13,8 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 
 
 	const rasterAnalysesUrl = 'https://api.ellipsis-drive.com/v3/path/'+prediction_pathId+'/raster/timestamp/analyse';
+	// console.log('rasterAnalysesUrl:', rasterAnalysesUrl);
+	// console.log('current_timestamp:', current_timestamp);
 
 
 	const params = new URLSearchParams({
@@ -37,6 +39,7 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 		
 		if (cluster_value != null) { 
 			document.querySelector("#cluster_div").innerHTML = '<strong>'+cluster_value+'</strong>';
+			// console.log('Cluster selezionato:', current_timestamp);
 			createEllipsisSelectionRaster(cluster_value, current_timestamp.id);
 			// document.querySelector("#analysis_block").setAttribute("expanded", true);
 			document.querySelector("#chart_block").setAttribute("expanded", true);
@@ -51,7 +54,7 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 			document.querySelector("#cluster_div").innerHTML = '...';
 			// document.querySelector("#analysis_block").removeAttribute("expanded");
 			document.querySelector("#chart_block").removeAttribute("expanded");
-			document.querySelector("#clicked_div").innerHTML = '...';
+			
 			myChart.resize({
 				width:0,
 				height:0
@@ -70,6 +73,8 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 
 // Raster layer
 const createEllipsisSelectionRaster = async (cluster_value, timestampId) => {
+	// console.log("timestampId:", timestampId);
+	// console.log("cluster_value:", cluster_value);
 	// Stile client side
 	const selection_style = {
 		parameters: {
@@ -83,8 +88,10 @@ const createEllipsisSelectionRaster = async (cluster_value, timestampId) => {
 			},
 			noData: "band1 != "+cluster_value
 		},
-		method: "v2",
+		method: "v2"
 	};
+
+	// console.log("selection_style:", JSON.stringify(selection_style));
 							
 	clearpredLayerSelection();
 					

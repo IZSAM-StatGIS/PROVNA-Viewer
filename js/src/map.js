@@ -137,11 +137,28 @@ const initMap = () => {
 		
         analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
         
-		document.querySelector("#clicked_div")
-			.innerHTML = "Cluster values at the clicked location ("+lng.toFixed(5).toString() +", "+lat.toFixed(5).toString()+")";
+		/*document.querySelector("#clicked_div")
+			.innerHTML = "Cluster values at the clicked location ("+lng.toFixed(5).toString() +", "+lat.toFixed(5).toString()+")";*/
 
-        
+		document.querySelector("#lng_input").value = lng.toFixed(5).toString();
+		document.querySelector("#lat_input").value = lat.toFixed(5).toString();
+
     });
+
+	document.querySelector("#marker_btn").addEventListener("click", () => {
+		let selected_year = document.querySelector("#year_slider").value;
+		let lng = parseFloat(document.querySelector("#lng_input").value);
+		let lat = parseFloat(document.querySelector("#lat_input").value);
+		if (marker) {
+			marker.remove(); // Rimuove il marker esistente
+		}
+		// Crea un nuovo marker e lo aggiunge alla mappa
+		marker = new maplibregl.Marker({ color: '#39BEBA' })
+			.setLngLat([lng, lat])
+			.addTo(map);
+		
+		analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
+	});
 
 	map.on('mousemove', (e) => {
 		let {lng, lat} = e.lngLat.wrap();

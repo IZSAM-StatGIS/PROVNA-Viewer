@@ -70,8 +70,15 @@
           <calcite-block-section expanded icon-start="graph-time-series" text="Values over time">
             <calcite-notice open kind="brand" width="full" scale="s">
               <!-- div slot="title">Info</div -->
-              <div slot="message" id="clicked_div">...</div>
+              <div slot="message">Update by clicking on another location or entering coordinates below</div>
             </calcite-notice>
+
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+              <calcite-input style="flex: 1;" prefix-text="Lon" placeholder="Longitude (e.g. 12.4924)" scale="s" id="lng_input"></calcite-input>
+              <calcite-input style="flex: 1;" prefix-text="Lat" placeholder="Latitude (e.g. 43.4924)" scale="s" id="lat_input"></calcite-input>
+              <calcite-button  style="flex: 1;" scale="s" icon-start="pin-tear" id="marker_btn">Update location</calcite-button>
+            </div>
+
             <div id="chart-container"></div>
           </calcite-block-section>
 
