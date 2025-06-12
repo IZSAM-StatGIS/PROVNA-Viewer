@@ -160,6 +160,27 @@ const initMap = () => {
 		analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
 	});
 
+	document.addEventListener("calciteColorPickerChange", (e) => {
+		if (marker) {
+			// console.log("Color changed:", e.target.value);
+			// console.log(marker.getLngLat())
+			let {lng, lat} = marker.getLngLat();
+			let selected_year = document.querySelector("#year_slider").value.toString();
+			analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
+		}
+	});
+
+	document.querySelector("#pred_sel_color_reset").addEventListener("click", () => {
+		document.querySelector("#pred_sel_color").value = '#00FFFF'; // Reset to default color
+		if (marker) {
+			// console.log("Color changed:", e.target.value);
+			// console.log(marker.getLngLat())
+			let {lng, lat} = marker.getLngLat();
+			let selected_year = document.querySelector("#year_slider").value.toString();
+			analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
+		}
+	});
+
 	map.on('mousemove', (e) => {
 		let {lng, lat} = e.lngLat.wrap();
 		// console.log("Mouse coordinates:", lng, lat);

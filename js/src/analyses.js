@@ -76,6 +76,10 @@ const createEllipsisSelectionRaster = async (cluster_value, timestampId) => {
 	// console.log("timestampId:", timestampId);
 	// console.log("cluster_value:", cluster_value);
 	// Stile client side
+
+	const color = document.querySelector("#pred_sel_color").value;
+	console.log("color:", color);
+
 	const selection_style = {
 		parameters: {
 			alphaMultiplier: 1,
@@ -83,7 +87,7 @@ const createEllipsisSelectionRaster = async (cluster_value, timestampId) => {
 				defaultTarget: { color: "#CDBA88" },
 				type: "caseMap",
 				caseMap: [
-					{ expression: "band1 == "+cluster_value, target: { color: "#6ffc03" } },
+					{ expression: "band1 == "+cluster_value, target: { color: color } },
 				],
 			},
 			noData: "band1 != "+cluster_value

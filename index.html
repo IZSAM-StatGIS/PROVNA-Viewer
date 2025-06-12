@@ -108,13 +108,19 @@
           </calcite-radio-button-group>
       </calcite-block>
 
-      <calcite-block expanded collapsible heading="Ecoregions" description="Layers transparency % adjustment" icon-start="contrast">
-        <calcite-block-section expanded icon-start="image-layer" text="Data layer">
+      <calcite-block expanded collapsible heading="Ecoregions" description="Data and selection layers adjustment" icon-start="layer-settings">
+        <calcite-block-section expanded text="Data opacity" icon-start="transparency">
           <calcite-slider id="pred_opacity_slider" label-handles ticks="25" label-ticks min="0" max="100" value="90" step="1"></calcite-slider>  
         </calcite-block-section>     
-        <calcite-block-section expanded icon-start="layer" text="Selection layer">
+        <calcite-block-section text="Selection opacity" icon-start="transparency">
           <calcite-slider id="pred_sel_opacity_slider" label-handles ticks="25" label-ticks min="0" max="100" value="100" step="1" disabled></calcite-slider>  
         </calcite-block-section> 
+        <calcite-block-section text="Selection color" icon-start="paint-bucket">
+          <div style="display: flex; justify-content: center;margin-bottom: 0.5rem;">
+            <calcite-color-picker id="pred_sel_color" scale="m" value="#00FFFF" saved-disabled></calcite-color-picker>
+          </div>
+          <calcite-button id="pred_sel_color_reset" scale="s" icon-start="reset" appearance="outline" width="full">Reset selection color</calcite-button>
+        </calcite-block-section>
       </calcite-block>
 
     </calcite-dialog>
