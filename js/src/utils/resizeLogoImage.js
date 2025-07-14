@@ -26,6 +26,8 @@ export function resizeProvnaLogoImage(blockSize = '3.5 rem'){
         const shell = document.querySelector('calcite-shell');
         const navigation = shell.querySelector('calcite-navigation');
         const logo = navigation.querySelector('calcite-navigation-user');
+
+        console.log(logo)
     
         const srAccess = () => {
             if (logo.shadowRoot) {
@@ -34,7 +36,12 @@ export function resizeProvnaLogoImage(blockSize = '3.5 rem'){
                 // Modifiche sui nodi di shadowRoot
                 const img = logo.shadowRoot.querySelector('button').querySelector('calcite-avatar');
                 img.style.blockSize = 3.5 + 'rem';
-                img.style.inlineSize = 3.5 + 'rem';
+                img.style.inlineSize = 4 + 'rem';
+                img.style.setProperty(
+                    '--calcite-avatar-corner-radius',
+                    0,
+                    'important'   // facoltativo: imposta !important
+                );
             } else {
                 setTimeout(srAccess, 50); // riprova finché non è pronto
             }
