@@ -56,6 +56,10 @@ const drawChart = (data, year) => {
 			axisTick: { show: false },   // ❌ niente tacche
 			// splitLine: { show: false }   // ❌ niente linee orizzontali
 		},
+		grid: {
+            left: '8%', right: '10%', top: '15%', bottom: '20%'
+        },
+
 
 		series: [{
 			name: 'Ecoregion',

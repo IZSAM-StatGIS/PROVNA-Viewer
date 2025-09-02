@@ -5,7 +5,7 @@ const initMap = () => {
     map = new maplibregl.Map({
 		container: 'map', // container id
 		center: [11, 28], // starting position [lng, lat]
-		zoom: 3, // starting zoom
+		zoom: 3.5, // starting zoom
 		style: {
 			version: 8,
 			sources: {},
@@ -25,10 +25,15 @@ const initMap = () => {
     
 	map.on('load', () => {
 
+		/*
 		map.fitBounds([
-			[-38.771325000611114, -0.01637782719676295], // Southwest corner
-			[67.96414281237787, 42.679722632494475]      // Northeast corner
-		]);
+			[-20.0, 10.0], // Sud-Ovest (più a ovest e più a sud)
+			[37.5, 40.0]   // Nord-Est (un filo più a est e a nord)
+		], {
+			padding: { top: 40, bottom: 40, left: 320, right: 550 } // spazio per i pannelli laterali
+		});
+		*/
+
 
         // Aggiunge il layer satellitare esri
 	    map.addSource('arcgis-imagery', {
@@ -158,6 +163,50 @@ const initMap = () => {
 			.addTo(map);
 		
 		analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
+	});
+
+	document.querySelector("#plot_variables_btn").addEventListener("click", () => {
+		let lng = parseFloat(document.querySelector("#lng_input").value);
+		let lat = parseFloat(document.querySelector("#lat_input").value);
+
+		const plot_dialog = document.querySelector("#plot-dialog");
+		plot_dialog.setAttribute("open", true);
+		plot_dialog.setAttribute("heading", `ECOPATH Variables at LON=${lng.toFixed(5)}, LAT=${lat.toFixed(5)}`);
+
+		const img = document.querySelector("#plot_img")
+		const statusEl = document.querySelector("#plot_status"); // <div> opzionale per messaggi
+
+		// Feedback UI
+		if (statusEl) {
+			statusEl.innerHTML = `<calcite-icon icon="hourglass-active" /> Loading content...`;
+		}
+
+		// console.log("Plotting variables for:", lng, lat, prediction_pathId);
+		const base = "https://wstest.izs.it/SpatNTW_ECOPATH_COORDS";
+
+		// Costruisci URL in modo robusto
+		const url = new URL(base);
+		url.search = new URLSearchParams({
+			LON: String(lng),
+			LAT: String(lat),
+			_t: Date.now().toString() // cache-busting
+		}).toString();
+
+		// Gestione eventi immagine
+		img.onload = () => {
+			img.title = `LON=${lng}, LAT=${lat}`;
+			img.alt = "Anteprima ECOPATH";
+			if (statusEl) statusEl.innerHTML = `<calcite-button icon-start="launch" href="${base}?LON=${lng}&LAT=${lat}" target="_blank" rel="noopener">
+												Open at full resolution in a new tab</calcite-button>`;
+		};
+		img.onerror = () => {
+			img.alt = "Error loading image";
+			if (statusEl) statusEl.textContent = "Impossible to load the image";
+		};
+
+		// Assegna src per innescare il download
+		img.src = url.toString();
+
 	});
 
 	document.addEventListener("calciteColorPickerChange", (e) => {
@@ -295,6 +344,13 @@ const initMap = () => {
 		prediction_pathId = e.target.value;
 		let selected_year = document.querySelector("#year_slider").value.toString();
         let selected_timestampId = predLayer_timestampIds.find(item => item.description === selected_year);
+
+		// Attiva o disattiva il bottone per chiamare il plot delle variabili
+		if (prediction_pathId === 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b') { // Pred55
+			document.querySelector("#plot_variables_btn").setAttribute("disabled", true);
+		} else {
+			document.querySelector("#plot_variables_btn").removeAttribute("disabled");
+		}
 		
 		clearpredLayerSelection();
 		fetchPredTimestamps();

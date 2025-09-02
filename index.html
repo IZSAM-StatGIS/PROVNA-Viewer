@@ -76,10 +76,11 @@
             <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
               <calcite-input style="flex: 1;" prefix-text="Lon" placeholder="Longitude (e.g. 12.4924)" scale="s" id="lng_input"></calcite-input>
               <calcite-input style="flex: 1;" prefix-text="Lat" placeholder="Latitude (e.g. 43.4924)" scale="s" id="lat_input"></calcite-input>
-              <calcite-button  style="flex: 1;" scale="s" icon-start="pin-tear" id="marker_btn">Update location</calcite-button>
+              <calcite-button  style="flex: 1;" scale="s" icon-start="pin-tear" id="marker_btn">Pin position</calcite-button>
+              <calcite-button  style="flex: 1;" scale="s" icon-start="heat-chart" id="plot_variables_btn" disabled>Variables</calcite-button>
             </div>
 
-            <div id="chart-container"></div>
+            <div id="chart-container" style="height: 230px;"></div>
           </calcite-block-section>
 
         </calcite-block>
@@ -123,6 +124,11 @@
         </calcite-block-section>
       </calcite-block>
 
+    </calcite-dialog>
+
+    <calcite-dialog modal outside-close-disabled id="plot-dialog" slot="dialogs" width="l" scale="l" close-enabled kind="brand">
+      <img id="plot_img" alt="ECOPATH" />
+      <div id="plot_status" slot="footer-end"></div>
     </calcite-dialog>
 
     <calcite-shell-panel slot="footer" layout="horizontal" height="s">
