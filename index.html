@@ -7,7 +7,7 @@
   
   <!-- Calcite Components -->
   <link rel="stylesheet" href="https://unpkg.com/@esri/calcite-components/dist/calcite/calcite.css">
-  <script type="module" src="https://js.arcgis.com/calcite-components/3.1.0/calcite.esm.js"></script>
+  <script type="module" src="https://js.arcgis.com/calcite-components/3.2.0/calcite.esm.js"></script>
 
   <!-- MapLibre GL JS -->
   <script src="https://unpkg.com/maplibre-gl@^5.5.0/dist/maplibre-gl.js"></script>
@@ -77,7 +77,7 @@
               <calcite-input style="flex: 1;" prefix-text="Lon" placeholder="Longitude (e.g. 12.4924)" scale="s" id="lng_input"></calcite-input>
               <calcite-input style="flex: 1;" prefix-text="Lat" placeholder="Latitude (e.g. 43.4924)" scale="s" id="lat_input"></calcite-input>
               <calcite-button  style="flex: 1;" scale="s" icon-start="pin-tear" id="marker_btn">Pin position</calcite-button>
-              <calcite-button  style="flex: 1;" scale="s" icon-start="heat-chart" id="plot_variables_btn" disabled>Variables</calcite-button>
+              <calcite-button  style="flex: 1;" scale="s" icon-start="matrix-heat-chart" id="plot_variables_btn" disabled>EcoPath</calcite-button>
             </div>
 
             <div id="chart-container" style="height: 230px;"></div>
@@ -126,7 +126,7 @@
 
     </calcite-dialog>
 
-    <calcite-dialog modal outside-close-disabled id="plot-dialog" slot="dialogs" width="l" scale="l" close-enabled kind="brand">
+    <calcite-dialog modal outside-close-disabled id="plot-dialog" slot="dialogs" width="l" scale="l" close-enabled kind="brand" loading>
       <img id="plot_img" alt="ECOPATH" />
       <div id="plot_status" slot="footer-end"></div>
     </calcite-dialog>

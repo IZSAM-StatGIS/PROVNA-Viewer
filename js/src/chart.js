@@ -59,8 +59,6 @@ const drawChart = (data, year) => {
 		grid: {
             left: '8%', right: '10%', top: '15%', bottom: '20%'
         },
-
-
 		series: [{
 			name: 'Ecoregion',
 			type: 'scatter',

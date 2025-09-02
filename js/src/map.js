@@ -171,15 +171,12 @@ const initMap = () => {
 
 		const plot_dialog = document.querySelector("#plot-dialog");
 		plot_dialog.setAttribute("open", true);
-		plot_dialog.setAttribute("heading", `ECOPATH Variables at LON=${lng.toFixed(5)}, LAT=${lat.toFixed(5)}`);
+		plot_dialog.setAttribute("heading", `ECOPATH at Lon: ${lng.toFixed(5)} and Lat: ${lat.toFixed(5)}`);
 
 		const img = document.querySelector("#plot_img")
 		const statusEl = document.querySelector("#plot_status"); // <div> opzionale per messaggi
-
-		// Feedback UI
-		if (statusEl) {
-			statusEl.innerHTML = `<calcite-icon icon="hourglass-active" /> Loading content...`;
-		}
+		if (statusEl) statusEl.innerHTML = "Loading image...";
+		plot_dialog.setAttribute("loading", true);
 
 		// console.log("Plotting variables for:", lng, lat, prediction_pathId);
 		const base = "https://wstest.izs.it/SpatNTW_ECOPATH_COORDS";
@@ -194,8 +191,9 @@ const initMap = () => {
 
 		// Gestione eventi immagine
 		img.onload = () => {
+			plot_dialog.removeAttribute("loading");
 			img.title = `LON=${lng}, LAT=${lat}`;
-			img.alt = "Anteprima ECOPATH";
+			img.alt = "ECOPATH";
 			if (statusEl) statusEl.innerHTML = `<calcite-button icon-start="launch" href="${base}?LON=${lng}&LAT=${lat}" target="_blank" rel="noopener">
 												Open at full resolution in a new tab</calcite-button>`;
 		};
