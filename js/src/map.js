@@ -194,8 +194,22 @@ const initMap = () => {
 			plot_dialog.removeAttribute("loading");
 			img.title = `LON=${lng}, LAT=${lat}`;
 			img.alt = "ECOPATH";
-			if (statusEl) statusEl.innerHTML = `<calcite-button icon-start="launch" href="${base}?LON=${lng}&LAT=${lat}" target="_blank" rel="noopener">
-												Open at full resolution in a new tab</calcite-button>`;
+
+			if (statusEl) {
+			// Crea il bottone per aprire in un'altra scheda. Il link viene chiamato con JS per evitare url visibile in basso a sx
+				statusEl.innerHTML = "";
+				const btn = document.createElement("calcite-button");
+				btn.id = "ecopath_new_tab_btn";
+				btn.iconStart = "launch";
+				btn.type = "button";
+				btn.textContent = "Open at full resolution in a new tab";
+				statusEl.appendChild(btn);
+
+				btn.addEventListener("click", () => {
+					const fullUrl = `${base}?LON=${lng}&LAT=${lat}`;
+					window.open(fullUrl, "_blank");
+				});
+			}
 		};
 		img.onerror = () => {
 			img.alt = "Error loading image";
