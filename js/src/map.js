@@ -195,9 +195,46 @@ const initMap = () => {
 			img.title = `LON=${lng}, LAT=${lat}`;
 			img.alt = "ECOPATH";
 
+			const panzoom = new Panzoom(img);
+			img.addEventListener('wheel', panzoom.zoomWithWheel);
+
 			if (statusEl) {
-			// Crea il bottone per aprire in un'altra scheda. Il link viene chiamato con JS per evitare url visibile in basso a sx
 				statusEl.innerHTML = "";
+				// Controlli panzoom
+
+				const zoomin_btn = document.createElement("calcite-button");
+				zoomin_btn.id = "panzoom_reset_btn";
+				zoomin_btn.iconStart = "magnifying-glass-plus";
+				zoomin_btn.textContent = "Zoom in";
+				statusEl.appendChild(zoomin_btn);
+				zoomin_btn.addEventListener("click", () => {
+					panzoom.zoomIn();
+				});
+
+				statusEl.appendChild(document.createTextNode(" ")); // spazio
+
+				const zoomout_btn = document.createElement("calcite-button");
+				zoomout_btn.id = "panzoom_reset_btn";
+				zoomout_btn.iconStart = "magnifying-glass-minus";
+				zoomout_btn.textContent = "Zoom out";
+				statusEl.appendChild(zoomout_btn);
+				zoomout_btn.addEventListener("click", () => {
+					panzoom.zoomOut();
+				});
+
+				statusEl.appendChild(document.createTextNode(" ")); // spazio
+
+				const reset_btn = document.createElement("calcite-button");
+				reset_btn.id = "panzoom_reset_btn";
+				reset_btn.iconStart = "reset";
+				reset_btn.textContent = "Reset zoom/pan";
+				statusEl.appendChild(reset_btn);
+				reset_btn.addEventListener("click", () => {
+					panzoom.reset();
+				});
+
+				// Crea il bottone per aprire in un'altra scheda. Il link viene chiamato con JS per evitare url visibile in basso a sx
+				/*
 				const btn = document.createElement("calcite-button");
 				btn.id = "ecopath_new_tab_btn";
 				btn.iconStart = "launch";
@@ -208,7 +245,7 @@ const initMap = () => {
 				btn.addEventListener("click", () => {
 					const fullUrl = `${base}?LON=${lng}&LAT=${lat}`;
 					window.open(fullUrl, "_blank");
-				});
+				});*/
 			}
 		};
 		img.onerror = () => {

@@ -22,6 +22,9 @@
           integrity="sha512-XSmbX3mhrD2ix5fXPTRQb2FwK22sRMVQTpBP2ac8hX7Dh/605hA2QDegVWiAvZPiXIxOV0CbkmUjGionDpbCmw=="
           crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+  <!-- PanZoom -->
+  <script src="https://unpkg.com/@panzoom/panzoom@4.6.0/dist/panzoom.min.js"></script>
+
   <!-- Custom CSS -->
   <link rel="stylesheet" href="css/style.css">
 
@@ -126,9 +129,10 @@
 
     </calcite-dialog>
 
-    <calcite-dialog modal outside-close-disabled id="plot-dialog" slot="dialogs" width="l" scale="l" close-enabled kind="brand" loading>
+    <calcite-dialog outside-close-disabled modal id="plot-dialog" slot="dialogs" width="l" scale="l" close-enabled kind="brand" loading resizable drag-enabled>
       <img id="plot_img" alt="ECOPATH" />
-      <div id="plot_status" slot="footer-end"></div>
+      <div id="plot_status" slot="footer-end">
+      </div>
     </calcite-dialog>
 
     <calcite-shell-panel slot="footer" layout="horizontal" height="s">
