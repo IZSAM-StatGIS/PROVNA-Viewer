@@ -1,5 +1,5 @@
 import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
-import { readCSV } from "./csv-layer.js";
+import { readCSV, buildLocationsFromGeoJSON } from "./csv-layer.js";
 
 let map, marker, prediction_pathId = 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b';
 const initMap = () => {
@@ -119,6 +119,11 @@ const initMap = () => {
 	});
    
     map.on('click', (e) => {
+
+		if (map.getLayer('csv-points')) {
+			const features = map.queryRenderedFeatures(e.point, { layers: ["csv-points"] });
+  			if (features.length > 0) return;  // 👉 ignora click perché stai cliccando un punto
+		}
 
         const { lng, lat } = e.lngLat;
         let selected_year = document.querySelector("#year_slider").value;
@@ -339,6 +344,14 @@ const initMap = () => {
 			// console.log("Spostando layer:", layer.id);
 			map.moveLayer(layer.id);  
 		});
+
+		// 🚀 sposta in cima i punti csv
+		layersOnTheMap
+		.filter(layer => layer.id.startsWith('csv-points'))  
+		.forEach(layer => {
+			// console.log("Spostando layer:", layer.id);
+			map.moveLayer(layer.id);  
+		});
 	};
 
 	// Basemap toggler
@@ -410,8 +423,22 @@ const initMap = () => {
         }
 	});
 
+	// UPLOAD CSV LAYER
+	// ===========================================================================================
+
 	// File upload handler
 	document.querySelector('#input_file').addEventListener('calciteInputInput', async (event) => {
+
+		if (marker) {
+			marker.remove();
+		}
+
+		// Rimuove risultati precedenti
+		clearpredLayerSelection();
+		// Aggiorna area di notifica
+		document.querySelector("#cluster_div").innerHTML = '...';
+		// document.querySelector("#analysis_block").removeAttribute("expanded");
+		document.querySelector("#chart_block").removeAttribute("expanded");
 
 		const file = event.target.files[0];
 
@@ -432,8 +459,28 @@ const initMap = () => {
 
 		// 2) SE IL FILE ESISTE → processa CSV normalmente
 		try {
+
+			// 1) Leggi CSV → GeoJSON
 			const geojson = await readCSV(file);
 			console.log("GeoJSON generato:", geojson);
+
+			// 2) Costruisci locations
+			/*
+			const locations = buildLocationsFromGeoJSON(geojson);
+			console.log("Locations:", locations);
+
+			// 3) Chiamata API
+			let selected_timestampId = predLayer_timestampIds.find(
+				item => String(item.description) === String(selected_year));
+
+			const apiResult = await callGetLocationInfoAPI(prediction_pathId, selected_timestampId.id, locations);
+			console.log("API response:", apiResult);
+
+			// 4) Aggiungi proprietà ai features del GeoJSON
+			geojson.features.forEach((feature, index) => {
+				feature.properties["PROVNA Ecoregion"] = apiResult[index];
+			});
+			*/
 
 			if (map.getSource("csv-points")) {
 				map.getSource("csv-points").setData(geojson);
@@ -461,7 +508,7 @@ const initMap = () => {
 					source: "csv-points",
 					paint: {
 						"circle-radius": 8,
-						"circle-color": "#007cbf"
+						"circle-color":  "#007cbf"        // ALTRIMENTI → azzurro
 					}
 				});
 
@@ -495,12 +542,20 @@ const initMap = () => {
 
 				// Evento click
 				map.on("click", "csv-points", (e) => {
+
 					let selected_year = document.querySelector("#year_slider").value;
 
 					const feature = e.features[0];
-					const feature_lat = feature.properties.lat;
-					const feature_lng = feature.properties.lon;
-					console.log("Punto cliccato:", feature_lng, feature_lat);
+
+					// recupera il nome effettivo delle colonne lat/lon
+					const latField = ["lat", "latitude"].find(f => f in feature.properties);
+					const lonField = ["lon", "lng", "longitude"].find(f => f in feature.properties);
+
+					// valori originali dal CSV
+					const feature_lat = feature.properties[latField];
+					const feature_lng = feature.properties[lonField];
+
+					// console.log("Punto cliccato:", feature_lng, feature_lat);
 
 					// Se esiste un marker, lo rimuove
 					if (marker) {
@@ -514,7 +569,7 @@ const initMap = () => {
 					document.querySelector("#lng_input").value = feature_lng.toString();
 					document.querySelector("#lat_input").value = feature_lat.toString();
 					
-					analyseRaster(feature_lng, feature_lat, predLayer_timestampIds, selected_year);
+					analyseRaster(parseFloat(feature_lng), parseFloat(feature_lat), predLayer_timestampIds, selected_year);
 				});
 
 			}
@@ -550,9 +605,12 @@ const initMap = () => {
 			marker.remove();
 			marker = null;
 		}
-		// Rimuovi l’eventuale selezione sul predLayer
-		let selected_year = document.querySelector("#year_slider").value;
-		analyseRaster(0, 0, predLayer_timestampIds, selected_year);
+		// Rimuove risultati precedenti
+		clearpredLayerSelection();
+		// Aggiorna area di notifica
+		document.querySelector("#cluster_div").innerHTML = '...';
+		// document.querySelector("#analysis_block").removeAttribute("expanded");
+		document.querySelector("#chart_block").removeAttribute("expanded");
 
 		// Resetta il campo file (Calcite)
 		const fileInput = document.querySelector("#input_file");

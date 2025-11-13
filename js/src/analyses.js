@@ -78,7 +78,7 @@ const createEllipsisSelectionRaster = async (cluster_value, timestampId) => {
 	// Stile client side
 
 	const color = document.querySelector("#pred_sel_color").value;
-	console.log("color:", color);
+	// console.log("color:", color);
 
 	const selection_style = {
 		parameters: {

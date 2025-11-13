@@ -79,4 +79,30 @@ const readCSV = (file) => {
   });
 };
 
-export { readCSV };
+const buildLocationsFromGeoJSON = (geojson) => {
+
+  const locations = [];
+
+  geojson.features.forEach(feature => {
+
+    // noms dinamici: lat/latitude, lon/lng/longitude
+    const latField = ["lat", "latitude"].find(f => f in feature.properties);
+    const lonField = ["lon", "lng", "longitude"].find(f => f in feature.properties);
+
+    if (!latField || !lonField) return; // safety
+
+    // valori originali del CSV (stringhe)
+    const latStr = feature.properties[latField];
+    const lonStr = feature.properties[lonField];
+
+    // convertiamo in numeri mantenendo i decimali originali
+    const latNum = parseFloat(latStr);
+    const lonNum = parseFloat(lonStr);
+
+    locations.push([lonNum, latNum]);   // numeri, ordine lon-lat
+  });
+
+  return locations;
+}
+
+export { readCSV, buildLocationsFromGeoJSON };
