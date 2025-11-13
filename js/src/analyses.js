@@ -112,13 +112,21 @@ const createEllipsisSelectionRaster = async (cluster_value, timestampId) => {
 	document.querySelector("#pred_sel_opacity_slider").value = 100;
 
 	// 🚀 sposta in cima i boundaries
-		const layersOnTheMap = map.getStyle().layers;
-		layersOnTheMap
-		.filter(layer => layer.id.startsWith('boundaries_'))  
-		.forEach(layer => {
-			// console.log("Spostando layer:", layer.id);
-			map.moveLayer(layer.id);  
-		});
+	const layersOnTheMap = map.getStyle().layers;
+	layersOnTheMap
+	.filter(layer => layer.id.startsWith('boundaries_'))  
+	.forEach(layer => {
+		// console.log("Spostando layer:", layer.id);
+		map.moveLayer(layer.id);  
+	});
+
+	// 🚀 sposta in cima i punti csv
+	layersOnTheMap
+	.filter(layer => layer.id.startsWith('csv-points'))  
+	.forEach(layer => {
+		// console.log("Spostando layer:", layer.id);
+		map.moveLayer(layer.id);  
+	});
 };
 
 

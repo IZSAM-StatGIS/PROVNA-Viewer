@@ -1,4 +1,5 @@
 import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
+import { readCSV } from "./csv-layer.js";
 
 let map, marker, prediction_pathId = 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b';
 const initMap = () => {
@@ -24,16 +25,6 @@ const initMap = () => {
     map.keyboard.disable();
     
 	map.on('load', () => {
-
-		/*
-		map.fitBounds([
-			[-20.0, 10.0], // Sud-Ovest (più a ovest e più a sud)
-			[37.5, 40.0]   // Nord-Est (un filo più a est e a nord)
-		], {
-			padding: { top: 40, bottom: 40, left: 320, right: 550 } // spazio per i pannelli laterali
-		});
-		*/
-
 
         // Aggiunge il layer satellitare esri
 	    map.addSource('arcgis-imagery', {
@@ -348,7 +339,6 @@ const initMap = () => {
 			// console.log("Spostando layer:", layer.id);
 			map.moveLayer(layer.id);  
 		});
-
 	};
 
 	// Basemap toggler
@@ -419,6 +409,169 @@ const initMap = () => {
             analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
         }
 	});
+
+	// File upload handler
+	document.querySelector('#input_file').addEventListener('calciteInputInput', async (event) => {
+
+		const file = event.target.files[0];
+
+		// 1) SE NON C’È FILE → rimuovi il layer
+		if (!file) {
+			if (map.getLayer("csv-points")) {
+				map.removeLayer("csv-points");
+			}
+			if (map.getLayer("csv-points-outline")) {
+				map.removeLayer("csv-points-outline");
+			}
+			if (map.getSource("csv-points")) {
+				map.removeSource("csv-points");
+			}
+			console.log("Layer CSV rimosso");
+			return;
+		}
+
+		// 2) SE IL FILE ESISTE → processa CSV normalmente
+		try {
+			const geojson = await readCSV(file);
+			console.log("GeoJSON generato:", geojson);
+
+			if (map.getSource("csv-points")) {
+				map.getSource("csv-points").setData(geojson);
+			} else {
+				map.addSource("csv-points", {
+					type: "geojson",
+					data: geojson
+				});
+
+				// bordo bianco
+				map.addLayer({
+					id: "csv-points-outline",
+					type: "circle",
+					source: "csv-points",
+					paint: {
+						"circle-radius": 10,
+						"circle-color": "#ffffff"
+					}
+				});
+
+				// punto interno blu
+				map.addLayer({
+					id: "csv-points",
+					type: "circle",
+					source: "csv-points",
+					paint: {
+						"circle-radius": 8,
+						"circle-color": "#007cbf"
+					}
+				});
+
+				const hoverPopup = new maplibregl.Popup({
+					closeButton: false,
+					closeOnClick: false
+				});
+
+				// Feedback visivo e apertura/chiusura del popup al passaggio del mouse
+				map.on("mouseenter", "csv-points", (e) => {
+
+					const feature = e.features[0];
+					const props = feature.properties;
+
+					// costruzione HTML dinamica
+					const html = Object.entries(props)
+						.map(([key, value]) => `<strong>${key}:</strong> ${value}`)
+						.join("<br>");
+
+					hoverPopup
+						.setLngLat(feature.geometry.coordinates)
+						.setHTML(html)
+						.addTo(map);
+
+					map.getCanvas().style.cursor = "pointer";
+				});
+				map.on("mouseleave", "csv-points", () => {
+					hoverPopup.remove();
+					map.getCanvas().style.cursor = "";
+				});
+
+				// Evento click
+				map.on("click", "csv-points", (e) => {
+					let selected_year = document.querySelector("#year_slider").value;
+
+					const feature = e.features[0];
+					const feature_lat = feature.properties.lat;
+					const feature_lng = feature.properties.lon;
+					console.log("Punto cliccato:", feature_lng, feature_lat);
+
+					// Se esiste un marker, lo rimuove
+					if (marker) {
+						marker.remove();
+					}
+					// Crea un nuovo marker e lo aggiunge alla mappa
+					marker = new maplibregl.Marker({ color: '#39BEBA' })
+						.setLngLat([parseFloat(feature_lng), parseFloat(feature_lat)])
+						.addTo(map);
+
+					document.querySelector("#lng_input").value = feature_lng.toString();
+					document.querySelector("#lat_input").value = feature_lat.toString();
+					
+					analyseRaster(feature_lng, feature_lat, predLayer_timestampIds, selected_year);
+				});
+
+			}
+
+			// fitBounds sui punti
+			const bounds = new maplibregl.LngLatBounds();
+			geojson.features.forEach(f => bounds.extend(f.geometry.coordinates));
+			if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 80 });
+
+		} catch (err) {
+			console.error(err);
+			alert(err);
+		}
+	});
+
+	document.querySelector("#clear_csv_btn").addEventListener("click", () => {
+
+		// Rimuovi i due layer se esistono
+		if (map.getLayer("csv-points")) {
+			map.removeLayer("csv-points");
+		}
+		if (map.getLayer("csv-points-outline")) {
+			map.removeLayer("csv-points-outline");
+		}
+
+		// Rimuovi la sorgente
+		if (map.getSource("csv-points")) {
+			map.removeSource("csv-points");
+		}
+
+		// Rimuovi l’eventuale marker cliccato
+		if (marker) {
+			marker.remove();
+			marker = null;
+		}
+		// Rimuovi l’eventuale selezione sul predLayer
+		let selected_year = document.querySelector("#year_slider").value;
+		analyseRaster(0, 0, predLayer_timestampIds, selected_year);
+
+		// Resetta il campo file (Calcite)
+		const fileInput = document.querySelector("#input_file");
+		if (fileInput) {
+			fileInput.value = "";               // HTML standard
+			fileInput.dispatchEvent(new Event("calciteInputInput")); // forza update
+		}
+
+		// RESET MAPPA al punto iniziale
+		map.flyTo({
+			center: [11, 28],
+			zoom: 3.5,
+			speed: 0.8
+		});
+
+
+	});
+
+	
     
 }
 
