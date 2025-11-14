@@ -63,23 +63,6 @@
 
           <calcite-slider id="year_slider" label-handles ticks="1" label-ticks min="2018" max="2024" value="2024" step="1"></calcite-slider>
         </calcite-block>
-
-        <!-- Upload block -->
-        <calcite-block id="upload_block" collapsible heading="Upload your data" 
-                      description="Add points from a CSV file" 
-                      icon-start="upload-to">
-
-            <calcite-notice open kind="brand" icon="exclamation-point-f" scale="s" style="margin-bottom: 0.5rem;">
-              <div slot="message">The file must contain the 'lat'/'lon' or 'latitude'/'longitude' columns</div>
-            </calcite-notice>
-              
-            <calcite-input id="input_file" type="file" accept="csv" icon placeholder="Enter your data">
-              <calcite-button id="clear_csv_btn" icon-start="trash" slot="action" scale="m">
-                clear
-              </calcite-button>
-            </calcite-input>
-            
-        </calcite-block>
         
         <!-- Chart block --> 
         <calcite-block id="chart_block" collapsible heading="Analysis result" 
@@ -108,6 +91,24 @@
             <div id="chart-container" style="height: 230px;"></div>
           </calcite-block-section>
 
+        </calcite-block>
+
+        <!-- Upload block -->
+        <calcite-block id="upload_block" collapsible heading="Upload your data" 
+                      description="Add points from a CSV file" 
+                      icon-start="upload-to">
+
+            <calcite-notice open kind="brand" icon="exclamation-point-f" scale="s" style="margin-bottom: 0.5rem;">
+              <div slot="message">The file must contain the 'lat'/'lon' or 'latitude'/'longitude' columns</div>
+            </calcite-notice>
+              
+            <calcite-input id="input_file" type="file" accept="csv" icon placeholder="Enter your data">
+              <calcite-button id="clear_csv_btn" icon-start="trash" slot="action" scale="m">
+                clear
+              </calcite-button>
+            </calcite-input>
+            <div id="upload_status" style="margin-top: 0.5rem;"></div>
+            
         </calcite-block>
 
       </calcite-block-group>

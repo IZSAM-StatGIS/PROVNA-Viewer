@@ -1,5 +1,5 @@
 import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
-import { readCSV, buildLocationsFromGeoJSON } from "./csv-layer.js";
+import { readCSV, buildLocationsFromGeoJSON, getLocationInfo } from "./csv-layer.js";
 
 let map, marker, prediction_pathId = 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b';
 const initMap = () => {
@@ -306,6 +306,10 @@ const initMap = () => {
 				let selected_year = document.querySelector("#year_slider").value.toString();
 				analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
 			}
+
+			if (uploadedFile) {
+				handleCsvFile(uploadedFile);
+			}
 		});	
 
 	}
@@ -392,10 +396,12 @@ const initMap = () => {
 
 	// ComboBox change
 	document.querySelector("#pred_combobox").addEventListener("calciteComboboxChange", (e)=>{
-		// console.log(e.target.value);
+		console.log(e.target.value);
 		prediction_pathId = e.target.value;
+		
 		let selected_year = document.querySelector("#year_slider").value.toString();
         let selected_timestampId = predLayer_timestampIds.find(item => item.description === selected_year);
+		console.log(selected_timestampId)
 
 		// Attiva o disattiva il bottone per chiamare il plot delle variabili
 		if (prediction_pathId === 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b') { // Pred55
@@ -406,11 +412,11 @@ const initMap = () => {
 		
 		clearpredLayerSelection();
 		fetchPredTimestamps();
+
 	});
 	
     // Slider change
 	document.querySelector("#year_slider").addEventListener("calciteSliderChange", (e)=>{
-		// console.log(e);
 		let value = e.target.value;
 		let selected_year = value.toString();
         let selected_timestampId = predLayer_timestampIds.find(item => item.description === selected_year);
@@ -421,14 +427,16 @@ const initMap = () => {
             const { lng, lat } = coords;
             analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
         }
+
+		if (uploadedFile) {
+			handleCsvFile(uploadedFile);
+		}
 	});
 
 	// UPLOAD CSV LAYER
 	// ===========================================================================================
-
-	// File upload handler
-	document.querySelector('#input_file').addEventListener('calciteInputInput', async (event) => {
-
+	
+	const handleCsvFile = async (file) => {
 		if (marker) {
 			marker.remove();
 		}
@@ -440,7 +448,6 @@ const initMap = () => {
 		// document.querySelector("#analysis_block").removeAttribute("expanded");
 		document.querySelector("#chart_block").removeAttribute("expanded");
 
-		const file = event.target.files[0];
 
 		// 1) SE NON C’È FILE → rimuovi il layer
 		if (!file) {
@@ -462,28 +469,30 @@ const initMap = () => {
 
 			// 1) Leggi CSV → GeoJSON
 			const geojson = await readCSV(file);
-			console.log("GeoJSON generato:", geojson);
-
 			// 2) Costruisci locations
-			/*
 			const locations = buildLocationsFromGeoJSON(geojson);
-			console.log("Locations:", locations);
-
-			// 3) Chiamata API
-			let selected_timestampId = predLayer_timestampIds.find(
-				item => String(item.description) === String(selected_year));
-
-			const apiResult = await callGetLocationInfoAPI(prediction_pathId, selected_timestampId.id, locations);
-			console.log("API response:", apiResult);
-
+			// 3) Chiamata API GetLocationInfo
+			let selected_year = document.querySelector("#year_slider").value;
+			let selected_timestampId = predLayer_timestampIds.find(item => String(item.description) === String(selected_year));
+			const getLocationInfoResult = await getLocationInfo(prediction_pathId, selected_timestampId.id, locations);
+			console.log("getLocationInfo response:", getLocationInfoResult);
 			// 4) Aggiungi proprietà ai features del GeoJSON
+			const attrName = `PROVNA Ecoregion (${selected_year})`;
 			geojson.features.forEach((feature, index) => {
-				feature.properties["PROVNA Ecoregion"] = apiResult[index];
+				feature.properties[attrName] = getLocationInfoResult[index];
 			});
-			*/
+			
 
+			// 5) Aggiungi layer alla mappa
 			if (map.getSource("csv-points")) {
 				map.getSource("csv-points").setData(geojson);
+				map.setPaintProperty("csv-points", "circle-color", [
+					"match",
+					["get", attrName],
+					0, "#A0A0A0",
+					"#007cbf"
+				]);
+
 			} else {
 				map.addSource("csv-points", {
 					type: "geojson",
@@ -508,7 +517,12 @@ const initMap = () => {
 					source: "csv-points",
 					paint: {
 						"circle-radius": 8,
-						"circle-color":  "#007cbf"        // ALTRIMENTI → azzurro
+						"circle-color": [
+							"match",
+							["get", attrName],   // 👈 NOME DINAMICO DELL'ATTRIBUTO
+							0, "#A0A0A0",        // ↳ grigio se 0
+							"#007cbf"            // ↳ azzurro altrimenti
+						]
 					}
 				});
 
@@ -525,8 +539,20 @@ const initMap = () => {
 
 					// costruzione HTML dinamica
 					const html = Object.entries(props)
-						.map(([key, value]) => `<strong>${key}:</strong> ${value}`)
+						.map(([key, value]) => {
+
+							// rileva se la proprietà è l'attributo ecoregion
+							const isEcoregion = key.startsWith("PROVNA Ecoregion");
+
+							// se è ecoregion e il valore è 0 → mostra "not assigned"
+							const displayValue = (isEcoregion && Number(value) === 0)
+								? "not assigned"
+								: value;
+
+							return `<strong>${key}:</strong> ${displayValue}`;
+						})
 						.join("<br>");
+
 
 					hoverPopup
 						.setLngLat(feature.geometry.coordinates)
@@ -583,9 +609,22 @@ const initMap = () => {
 			console.error(err);
 			alert(err);
 		}
+	}
+
+	// File upload handler
+	let uploadedFile = null;
+	document.querySelector('#input_file').addEventListener('calciteInputInput', async (event) => {
+		const file = event.target.files[0];
+		if (file) {
+			uploadedFile = file;
+			handleCsvFile(file);
+		}
+		
 	});
 
 	document.querySelector("#clear_csv_btn").addEventListener("click", () => {
+
+		uploadedFile = null;
 
 		// Rimuovi i due layer se esistono
 		if (map.getLayer("csv-points")) {
@@ -618,6 +657,9 @@ const initMap = () => {
 			fileInput.value = "";               // HTML standard
 			fileInput.dispatchEvent(new Event("calciteInputInput")); // forza update
 		}
+
+		// Pulisce l’area di stato upload
+		document.querySelector("#upload_status").innerHTML = '';
 
 		// RESET MAPPA al punto iniziale
 		map.flyTo({
