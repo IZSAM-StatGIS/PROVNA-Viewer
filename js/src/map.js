@@ -1,5 +1,5 @@
 import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
-import { readCSV, buildLocationsFromGeoJSON, getLocationInfo } from "./csv-layer.js";
+import { readCSV, buildLocationsFromGeoJSON, getLocationInfo, geojsonToCSV, downloadCSV } from "./csv-layer.js";
 
 let map, marker, prediction_pathId = 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b';
 const initMap = () => {
@@ -476,12 +476,21 @@ const initMap = () => {
 			let selected_timestampId = predLayer_timestampIds.find(item => String(item.description) === String(selected_year));
 			const getLocationInfoResult = await getLocationInfo(prediction_pathId, selected_timestampId.id, locations);
 			console.log("getLocationInfo response:", getLocationInfoResult);
+			
 			// 4) Aggiungi proprietà ai features del GeoJSON
 			const attrName = `PROVNA Ecoregion (${selected_year})`;
+
+			// Determina la pred attuale
+			const predType =
+				prediction_pathId === "be1e61d7-f9c7-488c-985f-cd97f7e7a04b"
+					? "Pred55"
+					: "Pred1600";
+
 			geojson.features.forEach((feature, index) => {
 				feature.properties[attrName] = getLocationInfoResult[index];
+				feature.properties["Prediction"] = predType;
 			});
-			
+			processedCsvGeojson = geojson;   // <-- 🔥 salva il geojson aggiornato
 
 			// 5) Aggiungi layer alla mappa
 			if (map.getSource("csv-points")) {
@@ -605,6 +614,9 @@ const initMap = () => {
 			geojson.features.forEach(f => bounds.extend(f.geometry.coordinates));
 			if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 80 });
 
+			// Abilita il bottone per scaricare il CSV arricchito
+			document.querySelector("#download_csv_btn").disabled = false;
+
 		} catch (err) {
 			console.error(err);
 			alert(err);
@@ -613,6 +625,8 @@ const initMap = () => {
 
 	// File upload handler
 	let uploadedFile = null;
+	let processedCsvGeojson = null;
+
 	document.querySelector('#input_file').addEventListener('calciteInputInput', async (event) => {
 		const file = event.target.files[0];
 		if (file) {
@@ -668,7 +682,21 @@ const initMap = () => {
 			speed: 0.8
 		});
 
+		// Disabilita il bottone per scaricare il CSV arricchito
+		document.querySelector("#download_csv_btn").disabled = true;
 
+	});
+
+	// Download CSV arricchito
+	document.querySelector("#download_csv_btn").addEventListener("click", () => {
+
+		if (!processedCsvGeojson) {
+			alert("No enriched CSV available to download.");
+			return;
+		}
+
+		const csv = geojsonToCSV(processedCsvGeojson);
+		downloadCSV(csv, "updated_points.csv");
 	});
 
 	

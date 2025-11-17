@@ -239,5 +239,39 @@ const getLocationInfo = async (pathId, timestampId, locations) => {
 };
 */
 
+const geojsonToCSV = (geojson) => {
 
-export { readCSV, buildLocationsFromGeoJSON, getLocationInfo };
+  if (!geojson || !geojson.features.length) return "";
+
+  // prendo tutte le chiavi (header) dalla somma di tutte le feature
+  const allKeys = new Set();
+  geojson.features.forEach(f => {
+    Object.keys(f.properties).forEach(k => allKeys.add(k));
+  });
+
+  const headers = Array.from(allKeys);
+
+  // righe CSV
+  const rows = geojson.features.map(f => {
+    return headers.map(h => f.properties[h] ?? "").join(",");
+  });
+
+  // header + rows
+  return headers.join(",") + "\n" + rows.join("\n");
+};
+
+const downloadCSV = (csvString, filename = "export.csv") => {
+  const blob = new Blob([csvString], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+
+  URL.revokeObjectURL(url);
+};
+
+
+
+export { readCSV, buildLocationsFromGeoJSON, getLocationInfo, geojsonToCSV, downloadCSV };

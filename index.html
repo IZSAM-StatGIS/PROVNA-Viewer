@@ -74,10 +74,10 @@
             </calcite-notice>
               
             <calcite-input id="input_file" type="file" accept="csv" icon placeholder="Enter your data">
-              <calcite-button id="clear_csv_btn" icon-start="trash" slot="action" scale="m">
-                clear
-              </calcite-button>
+              <calcite-button id="clear_csv_btn" kind="inverse" icon-start="trash" slot="action" scale="m" title="Clear"></calcite-button>
+              <calcite-button id="download_csv_btn" icon-start="download-to" slot="action" scale="m" title="Download enriched data" disabled></calcite-button>
             </calcite-input>
+
             <div id="upload_status" style="margin-top: 0.5rem;"></div>
             
         </calcite-block>
