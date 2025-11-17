@@ -105,39 +105,77 @@ const buildLocationsFromGeoJSON = (geojson) => {
   return locations;
 }
 
-/*
+// Versione con batching (max 30 coordinate per richiesta):
+// - Rispetta il nuovo limite di Ellipsis Drive
+// - Precisa come il single-point mode, molto più veloce
+// - Spezza locations in chunk da 30
 const getLocationInfo = async (pathId, timestampId, locations) => {
-
-  console.log("getLocationInfo called with params:", locations, "pathId:", pathId, "timestampId:", timestampId, "year:", year);
 
   if (!locations || locations.length === 0) {
     console.warn("getLocationInfo: nessuna location fornita");
     return [];
   }
 
-  // parametro locations come JSON in querystring
-  const locationsParam = JSON.stringify(locations);
-  const url = `https://api.ellipsis-drive.com/v3/path/${pathId}/raster/timestamp/${timestampId}/location?locations=${locationsParam}`;
+  const statusEl = document.querySelector("#upload_status");
+  statusEl.textContent = `Fetching location info for ${locations.length} points...`;
+  statusEl.classList.add("upload-blink");
 
-  console.log("GET:", url);
+  const MAX_CHUNK = 30;
+  const results = [];
 
-  const response = await fetch(url, {method: "GET"});
+  // funzione per dividere in chunk di max 30 elementi
+  const chunkArray = (arr, size) =>
+    arr.reduce((acc, _, i) => (
+      i % size ? acc : [...acc, arr.slice(i, i + size)]
+    ), []);
 
-  if (!response.ok) {
-    throw new Error(`GetLocationInfo error: ${response.status} ${response.statusText}`);
+  const chunks = chunkArray(locations, MAX_CHUNK);
+  let processed = 0;
+
+  for (const chunk of chunks) {
+
+    // lista di coordinate batchate: [[lon,lat], ...]
+    const locParam = JSON.stringify(chunk);
+    const url = 
+      `https://api.ellipsis-drive.com/v3/path/${pathId}` +
+      `/raster/timestamp/${timestampId}/location?locations=${locParam}`;
+
+    console.log("GET batch:", url);
+
+    const response = await fetch(url, { method: "GET" });
+
+    if (!response.ok) {
+      statusEl.classList.remove("upload-blink");
+      throw new Error(
+        `GetLocationInfo error: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const raw = await response.json();
+
+    // raw è del tipo: [[val, 65535], [val, 65535], ...]
+    raw.forEach(item => results.push(item[0]));
+
+    processed += chunk.length;
+    statusEl.textContent = `Fetching location info for ${locations.length} points... (${processed}/${locations.length})`;
   }
 
-  const raw = await response.json();
-  console.log("Raw LocationInfo response:", raw);
+  // Stop blink
+  statusEl.classList.remove("upload-blink");
 
-  // raw è un array di array: [[val, 65535], [val, 65535], ...]
-  // prendiamo SOLO il primo valore di ogni coppia
-  const values = raw.map(item => item[0]);
+  const total = results.length;
+  const zeros = results.filter(v => v === 0).length;
 
-  return values;
-}
-*/
+  // Messaggio finale
+  let msg = `${total} points loaded`;
+  if (zeros > 0) msg += ` (${zeros} outside valid raster area)`;
 
+  statusEl.textContent = msg;
+
+  return results;
+};
+
+/*
 // Versione single-point mode:
 // → ogni coordinata viene interrogata con una richiesta separata
 // → garantisce valori identici al risultato della analyse e accuratezza al pixel
@@ -199,7 +237,7 @@ const getLocationInfo = async (pathId, timestampId, locations) => {
 
   return results; // es: [1253, 1470, 1320, ...]
 };
-
+*/
 
 
 export { readCSV, buildLocationsFromGeoJSON, getLocationInfo };
