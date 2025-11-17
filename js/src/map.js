@@ -478,17 +478,21 @@ const initMap = () => {
 			console.log("getLocationInfo response:", getLocationInfoResult);
 			
 			// 4) Aggiungi proprietà ai features del GeoJSON
-			const attrName = `PROVNA Ecoregion (${selected_year})`;
 
-			// Determina la pred attuale
+			// Etichette per pred + anno
 			const predType =
 				prediction_pathId === "be1e61d7-f9c7-488c-985f-cd97f7e7a04b"
 					? "Pred55"
 					: "Pred1600";
 
+			const unifiedAttrName = `Ecoregion (${predType} - ${selected_year})`;
+
 			geojson.features.forEach((feature, index) => {
-				feature.properties[attrName] = getLocationInfoResult[index];
-				feature.properties["Prediction"] = predType;
+
+				const value = getLocationInfoResult[index]; // Numero restituito dall’API
+
+				// Attributo unico
+				feature.properties[unifiedAttrName] = value;
 			});
 			processedCsvGeojson = geojson;   // <-- 🔥 salva il geojson aggiornato
 
@@ -497,7 +501,7 @@ const initMap = () => {
 				map.getSource("csv-points").setData(geojson);
 				map.setPaintProperty("csv-points", "circle-color", [
 					"match",
-					["get", attrName],
+					["get", unifiedAttrName],   // 👈 NOME DINAMICO DELL'ATTRIBUTO
 					0, "#A0A0A0",
 					"#007cbf"
 				]);
@@ -528,7 +532,7 @@ const initMap = () => {
 						"circle-radius": 8,
 						"circle-color": [
 							"match",
-							["get", attrName],   // 👈 NOME DINAMICO DELL'ATTRIBUTO
+							["get", unifiedAttrName],   // 👈 NOME DINAMICO DELL'ATTRIBUTO
 							0, "#A0A0A0",        // ↳ grigio se 0
 							"#007cbf"            // ↳ azzurro altrimenti
 						]
@@ -551,7 +555,7 @@ const initMap = () => {
 						.map(([key, value]) => {
 
 							// rileva se la proprietà è l'attributo ecoregion
-							const isEcoregion = key.startsWith("PROVNA Ecoregion");
+							const isEcoregion = key.startsWith("Ecoregion (");
 
 							// se è ecoregion e il valore è 0 → mostra "not assigned"
 							const displayValue = (isEcoregion && Number(value) === 0)

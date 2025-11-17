@@ -253,12 +253,24 @@ const geojsonToCSV = (geojson) => {
 
   // righe CSV
   const rows = geojson.features.map(f => {
-    return headers.map(h => f.properties[h] ?? "").join(",");
+    return headers.map(h => {
+
+      const value = f.properties[h] ?? "";
+
+      // 👉 Se è un attributo ecoregion e vale 0 → esporta "not assigned"
+      if (h.startsWith("Ecoregion (") && Number(value) === 0) {
+        return "not assigned";
+      }
+
+      return value;
+
+    }).join(",");
   });
 
   // header + rows
   return headers.join(",") + "\n" + rows.join("\n");
 };
+
 
 const downloadCSV = (csvString, filename = "export.csv") => {
   const blob = new Blob([csvString], { type: "text/csv" });
