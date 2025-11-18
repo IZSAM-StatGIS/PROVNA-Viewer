@@ -437,14 +437,13 @@ const initMap = () => {
 	// ===========================================================================================
 
 	const handleCsvFile = async (file) => {
-		if (marker) {
+		/*if (marker) {
 			marker.remove();
 			console.log(map.getLayer('predLayer_selection'));
-		}
-
-		clearpredLayerSelection();
+		}*/
+		// clearpredLayerSelection();
 		// Aggiorna area di notifica
-		document.querySelector("#cluster_div").innerHTML = '...';
+		// document.querySelector("#cluster_div").innerHTML = '...';
 		// document.querySelector("#analysis_block").removeAttribute("expanded");
 		document.querySelector("#chart_block").removeAttribute("expanded");
 
