@@ -38,7 +38,7 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 		// console.log('Cluster', cluster_value)
 		
 		if (cluster_value != null) { 
-			document.querySelector("#cluster_div").innerHTML = '<strong>'+cluster_value+'</strong>';
+			document.querySelector("#cluster_div").innerHTML = "Selected ecoregion<strong>: "+cluster_value+"</strong>";
 			// console.log('Cluster selezionato:', current_timestamp);
 			createEllipsisSelectionRaster(cluster_value, current_timestamp.id);
 			// document.querySelector("#analysis_block").setAttribute("expanded", true);
@@ -46,7 +46,7 @@ const analyseRaster = (lng, lat, timestamps, year) => {
 			drawChart(data, year);
 			myChart.resize({
 				width: document.querySelector("#chart_block").offsetWidth - 10,
-				height: 250
+				height: 185
 			});
 		} else {
 			clearpredLayerSelection();

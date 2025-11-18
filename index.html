@@ -62,7 +62,7 @@
 
         <calcite-block expanded collapsible heading="Image/Year" description="Select the image and drag the slider to change year" icon-start="image-collection-explorer">
 
-          <calcite-combobox clear-disabled selection-mode="single-persist" id="pred_combobox" scale="m" width="full">
+          <calcite-combobox clear-disabled selection-mode="single-persist" id="pred_combobox" scale="s" width="full">
             <calcite-combobox-item selected value="be1e61d7-f9c7-488c-985f-cd97f7e7a04b" heading="Pred 55"></calcite-combobox-item>
             <calcite-combobox-item value="1d215c20-45e1-4e9f-b9d3-df66134586b3" heading="Pred 1600"></calcite-combobox-item>
           </calcite-combobox>
@@ -76,9 +76,7 @@
                       icon-start="upload-to">
 
             <calcite-notice open kind="brand" icon="exclamation-point-f" scale="s" style="margin-bottom: 0.5rem;">
-              <div slot="message">The file must contain the <b>lat</b>/<b>lon</b> or <b>latitude</b>/<b>longitude</b> columns.<br/>
-                For best results, use a <b>simple CSV</b> (e.g., one row per point and no complex formatted fields with embedded commas or multi-line notes).
-              </div>
+              <div slot="message">The file must contain the <b>lat</b>/<b>lon</b> or <b>latitude</b>/<b>longitude</b> columns</div>
             </calcite-notice>
               
             <calcite-input id="input_file" type="file" accept="csv" icon placeholder="Enter your data">
@@ -96,17 +94,18 @@
                       description="Click on the map to view the point's cluster and a chart of its values over time" 
                       icon-start="raster-analysis">
 
-          <calcite-block-section expanded icon-start="classify-pixels" text="Ecoregion class">
-            <calcite-notice open kind="brand" width="full" scale="l">
+          <!-- calcite-block-section expanded icon-start="classify-pixels" text="Ecoregion class"-->
+            <calcite-notice open kind="info" width="full" scale="s" icon="classify-pixels">
               <div slot="title" id="cluster_div">...</div>
-            </calcite-notice>
-          </calcite-block-section>
-
-          <calcite-block-section expanded icon-start="graph-time-series" text="Values over time">
-            <calcite-notice open kind="brand" width="full" scale="s">
-              <!-- div slot="title">Info</div -->
               <div slot="message">Update by clicking on another location or entering coordinates below</div>
             </calcite-notice>
+          <!-- </calcite-block-section> -->
+
+          <!-- calcite-block-section expanded icon-start="graph-time-series" text="Values over time" --> 
+            <!-- calcite-notice open kind="brand" width="full" scale="s" icon="graph-time-series">
+              <div slot="title">Values over time</div>
+              <div slot="message">Update by clicking on another location or entering coordinates below</div>
+            </calcite-notice -->
 
             <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
               <calcite-input style="flex: 1;" prefix-text="Lon" placeholder="Longitude (e.g. 12.4924)" scale="s" id="lng_input"></calcite-input>
@@ -115,8 +114,8 @@
               <calcite-button  style="flex: 1;" scale="s" icon-start="matrix-heat-chart" id="plot_variables_btn" disabled>EcoPath</calcite-button>
             </div>
 
-            <div id="chart-container" style="height: 230px;"></div>
-          </calcite-block-section>
+            <div id="chart-container" style="height: 185px;"></div>
+          <!-- /calcite-block-section -->
 
         </calcite-block>
 
@@ -125,7 +124,7 @@
 
     <calcite-dialog open id="layer-dialog" slot="dialogs" width="s" scale="s" heading="Layer management" 
                     placement="top-start" close-disabled drag-enabled kind="brand"
-                    style="--calcite-dialog-offset-y: 50px !important; --calcite-dialog-offset-x: 25px !important; --calcite-dialog-size-x: 300px !important">
+                    style="--calcite-dialog-offset-y: 50px !important; --calcite-dialog-offset-x: 25px !important; --calcite-dialog-size-x: 250px !important">
 
       <calcite-block expanded collapsible heading="Basemap" description="Change the basemap" icon-start="basemap">
         <calcite-radio-button-group id="basemap_toggler" name="basemap_toggler" layout="vertical" scale="l">
@@ -161,7 +160,7 @@
 
     </calcite-dialog>
 
-    <calcite-dialog outside-close-disabled modal id="plot-dialog" slot="dialogs" width="l" scale="l" close-enabled kind="brand" loading resizable drag-enabled>
+    <calcite-dialog outside-close-disabled modal id="plot-dialog" slot="dialogs" width="l" scale="l" close-enabled kind="brand" loading>
       <img id="plot_img" alt="ECOPATH" />
       <div id="plot_status" slot="footer-end">
       </div>

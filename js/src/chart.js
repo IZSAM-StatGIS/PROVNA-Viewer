@@ -57,7 +57,7 @@ const drawChart = (data, year) => {
 			// splitLine: { show: false }   // ❌ niente linee orizzontali
 		},
 		grid: {
-            left: '8%', right: '10%', top: '15%', bottom: '20%'
+            left: '8%', right: '10%', top: '10%', bottom: '10%'
         },
 		series: [{
 			name: 'Ecoregion',
