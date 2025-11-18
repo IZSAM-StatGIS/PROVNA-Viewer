@@ -25,6 +25,12 @@
   <!-- PanZoom -->
   <script src="https://unpkg.com/@panzoom/panzoom@4.6.0/dist/panzoom.min.js"></script>
 
+  <!-- PapaParse -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <!-- use xlsx.full.min.js from version 0.20.3 -->
+  <script type="text/javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
   <!-- Custom CSS -->
   <link rel="stylesheet" href="css/style.css">
 
@@ -75,7 +81,8 @@
               
             <calcite-input id="input_file" type="file" accept="csv" icon placeholder="Enter your data">
               <calcite-button id="clear_csv_btn" kind="inverse" icon-start="trash" slot="action" scale="m" title="Clear"></calcite-button>
-              <calcite-button id="download_csv_btn" icon-start="download-to" slot="action" scale="m" title="Download enriched data" disabled></calcite-button>
+              <calcite-button id="download_xlsx_btn" icon-start="file-excel" slot="action" scale="m" title="Download enriched points as XLSX" disabled></calcite-button>
+              <calcite-button id="download_geojson_btn" icon-start="layer-points" slot="action" scale="m" title="Download enriched points as GeoJSON" disabled></calcite-button>
             </calcite-input>
 
             <div id="upload_status" style="margin-top: 0.5rem;"></div>

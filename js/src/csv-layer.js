@@ -1,45 +1,65 @@
 import { map } from './map.js';
 
-// csv-layer.js
+
+// Pulisce stringhe problematiche nel CSV
+const cleanField = (value) => {
+  if (value == null) return "";
+
+  let v = String(value).trim();
+
+  // Rimuove doppi apici non chiusi
+  if (v.startsWith('"') && !v.endsWith('"')) {
+    v = v.replace(/^"/, ""); // rimuovi apice iniziale
+  }
+
+  // Rimuove apici finali isolati
+  if (v.endsWith('"') && !v.startsWith('"')) {
+    v = v.replace(/"$/, "");
+  }
+
+  // Doppie virgolette → una sola
+  v = v.replace(/""+/g, '"');
+
+  return v;
+};
 
 const readCSV = (file) => {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+    Papa.parse(file, {
+      header: true,          // usa la prima riga come header
+      skipEmptyLines: true,
+      dynamicTyping: false,  // trattiamo tutto come stringa, poi convertiamo noi
+      complete: (results) => {
+        const rows = results.data;
 
-    reader.onerror = () => reject("Error reading file");
-    reader.onload = () => {
-      try {
-        const text = reader.result.trim();
-        const rows = text.split(/\r?\n/).map(r => r.split(/[;,]/));
-
-        if (rows.length < 2) {
+        if (!rows.length) {
           reject("Empty or invalid CSV file");
           return;
         }
 
-        // headers normalizzati
-        const headers = rows[0].map(h => h.trim().toLowerCase());
-
+        // Trova nomi colonne lat/lon
+        const headers = Object.keys(rows[0]).map(h => h.trim().toLowerCase());
         const latNames = ["lat", "latitude"];
         const lonNames = ["lon", "lng", "longitude"];
 
-        const latIdx = headers.findIndex(h => latNames.includes(h));
-        const lonIdx = headers.findIndex(h => lonNames.includes(h));
+        const latKey = Object.keys(rows[0]).find(
+          (k) => latNames.includes(k.trim().toLowerCase())
+        );
+        const lonKey = Object.keys(rows[0]).find(
+          (k) => lonNames.includes(k.trim().toLowerCase())
+        );
 
-        if (latIdx === -1 || lonIdx === -1) {
-          reject("The file must be a CSV containing the 'lat'/'lon' or 'latitude'/'longitude' columns");
+        if (!latKey || !lonKey) {
+          reject("The file must contain 'lat'/'lon' or 'latitude'/'longitude' columns");
           return;
         }
 
+        // Costruisci FeatureCollection
         const features = [];
 
-        rows.slice(1).forEach((row, i) => {
-
-          const latStr = row[latIdx];   // stringa originale dal CSV
-          const lonStr = row[lonIdx];
-
-          const lat = parseFloat(latStr); // numero per MapLibre
-          const lon = parseFloat(lonStr);
+        rows.forEach((row, i) => {
+          const lat = parseFloat(row[latKey]);
+          const lon = parseFloat(row[lonKey]);
 
           if (isNaN(lat) || isNaN(lon)) {
             console.warn(`Row ${i + 2} ignored: invalid coordinates`);
@@ -52,15 +72,11 @@ const readCSV = (file) => {
               type: "Point",
               coordinates: [lon, lat]
             },
-            properties: Object.fromEntries(
-              headers.map((h, j) => [h, row[j]])
-              // 👆 mantiene lat/lon originali così come sono nel CSV
-            )
+            properties: row   // tutte le colonne così come sono, località incluse
           });
-
         });
 
-        if (features.length === 0) {
+        if (!features.length) {
           reject("No valid points found in CSV");
           return;
         }
@@ -69,15 +85,12 @@ const readCSV = (file) => {
           type: "FeatureCollection",
           features
         });
-
-      } catch (err) {
-        reject(`CSV error: ${err}`);
-      }
-    };
-
-    reader.readAsText(file);
+      },
+      error: (err) => reject(`CSV parse error: ${err}`)
+    });
   });
 };
+
 
 const buildLocationsFromGeoJSON = (geojson) => {
 
@@ -175,75 +188,14 @@ const getLocationInfo = async (pathId, timestampId, locations) => {
   return results;
 };
 
-/*
-// Versione single-point mode:
-// → ogni coordinata viene interrogata con una richiesta separata
-// → garantisce valori identici al risultato della analyse e accuratezza al pixel
-// → evita le differenze introdotte dalle richieste batch
-const getLocationInfo = async (pathId, timestampId, locations) => {
+const geojsonToXLSX = (geojson, filename = "export.xlsx") => {
 
-  console.log("getLocationInfo called with params:", locations, "pathId:", pathId, "timestampId:", timestampId);
-
-  if (!locations || locations.length === 0) {
-    console.warn("getLocationInfo: nessuna location fornita");
-    return [];
+  if (!geojson || !geojson.features.length) {
+    alert("No data available to export.");
+    return;
   }
 
-  const statusEl = document.querySelector("#upload_status");
-
-  statusEl.textContent = "Fetching location info for " + locations.length + " points...";
-  statusEl.classList.add("upload-blink"); // 🔥 INIZIA A LAMPEGGIARE
-
-  const results = [];
-
-  // Chiamata accurata: una richiesta per ogni singolo punto
-  for (const loc of locations) {
-
-    // loc = [lon, lat] → formattiamo come [[lon,lat]]
-    const locParam = JSON.stringify([loc]);
-    const url = 
-      `https://api.ellipsis-drive.com/v3/path/${pathId}` +
-      `/raster/timestamp/${timestampId}/location?locations=${locParam}`;
-
-    console.log("GET (single-point):", url);
-
-    const response = await fetch(url, { method: "GET" });
-
-    if (!response.ok) {
-      throw new Error(`GetLocationInfo error: ${response.status} ${response.message}`);
-    }
-
-    const raw = await response.json();
-    console.log("Raw single response:", raw);
-
-    const value = raw[0][0];   // primo valore della coppia
-    results.push(value);
-  }
-
-  // 🔥 STOP LAMPEGGIO
-  statusEl.classList.remove("upload-blink");
-  
-  // 🔢 Conteggi
-  const total = results.length;
-  const zeros = results.filter(v => v === 0).length;
-
-  // 📝 Messaggio finale
-  let msg = `${total} points loaded`;
-  if (zeros > 0) {
-    msg += ` (${zeros} outside the ecoregions area)`;
-  }
-
-  statusEl.textContent = msg;
-
-  return results; // es: [1253, 1470, 1320, ...]
-};
-*/
-
-const geojsonToCSV = (geojson) => {
-
-  if (!geojson || !geojson.features.length) return "";
-
-  // prendo tutte le chiavi (header) dalla somma di tutte le feature
+  // 1) Recupera tutte le colonne presenti
   const allKeys = new Set();
   geojson.features.forEach(f => {
     Object.keys(f.properties).forEach(k => allKeys.add(k));
@@ -251,29 +203,54 @@ const geojsonToCSV = (geojson) => {
 
   const headers = Array.from(allKeys);
 
-  // righe CSV
+  // 2) Costruisci array di oggetti per XLSX
   const rows = geojson.features.map(f => {
-    return headers.map(h => {
+    const obj = {};
 
-      const value = f.properties[h] ?? "";
+    headers.forEach(h => {
+      let v = f.properties[h] ?? "";
 
-      // 👉 Se è un attributo ecoregion e vale 0 → esporta "not assigned"
-      if (h.startsWith("Ecoregion (") && Number(value) === 0) {
-        return "not assigned";
+      // Ecoregion = 0 → "not assigned"
+      if (h.startsWith("Ecoregion (") && Number(v) === 0) {
+        v = "not assigned";
       }
 
-      return value;
+      // Evita che Excel converta numeri → date
+      if (typeof v === "number") {
+        v = String(v); 
+      }
 
-    }).join(",");
+      obj[h] = v;
+    });
+
+    return obj;
   });
 
-  // header + rows
-  return headers.join(",") + "\n" + rows.join("\n");
+  // 3) Converti in foglio Excel
+  const ws = XLSX.utils.json_to_sheet(rows);
+
+  // ---------------------------
+  //  OPTIONAL: autosize column widths
+  // ---------------------------
+  ws['!cols'] = headers.map(h => {
+    const maxLen = Math.max(
+      h.length,
+      ...rows.map(r => (r[h] ? r[h].toString().length : 0))
+    );
+    return { wch: Math.min(maxLen + 2, 40) }; // max 40 char per colonna
+  });
+
+  // 4) Workbook
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Data");
+
+  // 5) Scarica
+  XLSX.writeFile(wb, filename);
 };
 
-
-const downloadCSV = (csvString, filename = "export.csv") => {
-  const blob = new Blob([csvString], { type: "text/csv" });
+const downloadGeoJSON = (geojson, filename = "data.geojson") => {
+  const jsonString = JSON.stringify(geojson, null, 2); // indentato, più leggibile
+  const blob = new Blob([jsonString], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
   const a = document.createElement("a");
@@ -284,6 +261,4 @@ const downloadCSV = (csvString, filename = "export.csv") => {
   URL.revokeObjectURL(url);
 };
 
-
-
-export { readCSV, buildLocationsFromGeoJSON, getLocationInfo, geojsonToCSV, downloadCSV };
+export { readCSV, buildLocationsFromGeoJSON, getLocationInfo, geojsonToXLSX, downloadGeoJSON };

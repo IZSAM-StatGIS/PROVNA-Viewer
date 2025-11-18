@@ -1,9 +1,9 @@
 import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
-import { readCSV, buildLocationsFromGeoJSON, getLocationInfo, geojsonToCSV, downloadCSV } from "./csv-layer.js";
+import { readCSV, buildLocationsFromGeoJSON, getLocationInfo, geojsonToXLSX, downloadGeoJSON } from "./csv-layer.js";
 
 let map, marker, prediction_pathId = 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b';
 const initMap = () => {
-    map = new maplibregl.Map({
+	map = new maplibregl.Map({
 		container: 'map', // container id
 		center: [11, 28], // starting position [lng, lat]
 		zoom: 3.5, // starting zoom
@@ -13,32 +13,32 @@ const initMap = () => {
 			layers: [],
 			// glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=AlNInvvaWSvJjPJR6yim'
 		},
-		
+
 	});
-	map.addControl(new maplibregl.NavigationControl({showCompass: false}), 'top-left');
+	map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-left');
 	map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
 
 	// disable map rotation using right click + drag
-    map.dragRotate.disable();
+	map.dragRotate.disable();
 
-    // disable map rotation using keyboard
-    map.keyboard.disable();
-    
+	// disable map rotation using keyboard
+	map.keyboard.disable();
+
 	map.on('load', () => {
 
-        // Aggiunge il layer satellitare esri
-	    map.addSource('arcgis-imagery', {
-            type: 'raster',
-            tiles: [
-                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-            ],
-            tileSize: 256,
-            attribution:
-                'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, etc.'
+		// Aggiunge il layer satellitare esri
+		map.addSource('arcgis-imagery', {
+			type: 'raster',
+			tiles: [
+				'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+			],
+			tileSize: 256,
+			attribution:
+				'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, etc.'
 		});
 
 		map.addLayer({
-		    id: 'arcgis-imagery-layer',
+			id: 'arcgis-imagery-layer',
 			type: 'raster',
 			source: 'arcgis-imagery',
 			minzoom: 0,
@@ -47,18 +47,18 @@ const initMap = () => {
 
 		// Aggiunge le label esri
 		/*
-	    map.addSource('arcgis-labels', {
-            type: 'raster',
-            tiles: [
-                'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
-            ],
-            tileSize: 256,
-            attribution:
-                'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, etc.'
+		map.addSource('arcgis-labels', {
+			type: 'raster',
+			tiles: [
+				'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
+			],
+			tileSize: 256,
+			attribution:
+				'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, etc.'
 		});
 
 		map.addLayer({
-		    id: 'arcgis-labels-layer',
+			id: 'arcgis-labels-layer',
 			type: 'raster',
 			source: 'arcgis-labels',
 			minzoom: 0,
@@ -93,7 +93,7 @@ const initMap = () => {
 			source: 'dark-matter',
 			layout: { visibility: 'none' } // inizialmente nascosto
 		});
-		
+
 		// Vector layer
 		const boundaries = new MapboxgljsEllipsis.EllipsisVectorLayer({
 			pathId: '0347e311-9427-4891-9087-20a57cb24d5e',
@@ -101,7 +101,7 @@ const initMap = () => {
 			onlyTiles: true,
 			// style: 'a1c6ef13-7cf1-4ecf-97fb-f8f28f6dcbd4',
 			filter: [
-			"any",
+				"any",
 				["==", ["get", "country_co"], "MO"],
 				["==", ["get", "country_co"], "WI"],
 				["==", ["get", "country_co"], "AG"],
@@ -111,23 +111,23 @@ const initMap = () => {
 				["==", ["get", "country_co"], "EG"],
 			],
 		})
-		
-		boundaries.addTo(map)	
-		
+
+		boundaries.addTo(map)
+
 		fetchPredTimestamps();
 
 	});
-   
-    map.on('click', (e) => {
+
+	map.on('click', (e) => {
 
 		if (map.getLayer('csv-points')) {
 			const features = map.queryRenderedFeatures(e.point, { layers: ["csv-points"] });
-  			if (features.length > 0) return;  // 👉 ignora click perché stai cliccando un punto
+			if (features.length > 0) return;  // 👉 ignora click perché stai cliccando un punto
 		}
 
-        const { lng, lat } = e.lngLat;
-        let selected_year = document.querySelector("#year_slider").value;
-        // Se esiste un marker, lo rimuove
+		const { lng, lat } = e.lngLat;
+		let selected_year = document.querySelector("#year_slider").value;
+		// Se esiste un marker, lo rimuove
 		if (marker) {
 			marker.remove();
 		}
@@ -135,16 +135,16 @@ const initMap = () => {
 		marker = new maplibregl.Marker({ color: '#39BEBA' })
 			.setLngLat([lng, lat])
 			.addTo(map);
-		
-        analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
-        
+
+		analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
+
 		/*document.querySelector("#clicked_div")
 			.innerHTML = "Cluster values at the clicked location ("+lng.toFixed(5).toString() +", "+lat.toFixed(5).toString()+")";*/
 
 		document.querySelector("#lng_input").value = lng.toFixed(5).toString();
 		document.querySelector("#lat_input").value = lat.toFixed(5).toString();
 
-    });
+	});
 
 	document.querySelector("#marker_btn").addEventListener("click", () => {
 		let selected_year = document.querySelector("#year_slider").value;
@@ -157,7 +157,7 @@ const initMap = () => {
 		marker = new maplibregl.Marker({ color: '#39BEBA' })
 			.setLngLat([lng, lat])
 			.addTo(map);
-		
+
 		analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
 	});
 
@@ -258,7 +258,7 @@ const initMap = () => {
 		if (marker) {
 			// console.log("Color changed:", e.target.value);
 			// console.log(marker.getLngLat())
-			let {lng, lat} = marker.getLngLat();
+			let { lng, lat } = marker.getLngLat();
 			let selected_year = document.querySelector("#year_slider").value.toString();
 			analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
 		}
@@ -269,24 +269,24 @@ const initMap = () => {
 		if (marker) {
 			// console.log("Color changed:", e.target.value);
 			// console.log(marker.getLngLat())
-			let {lng, lat} = marker.getLngLat();
+			let { lng, lat } = marker.getLngLat();
 			let selected_year = document.querySelector("#year_slider").value.toString();
 			analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
 		}
 	});
 
 	map.on('mousemove', (e) => {
-		let {lng, lat} = e.lngLat.wrap();
+		let { lng, lat } = e.lngLat.wrap();
 		// console.log("Mouse coordinates:", lng, lat);
-        document.getElementById('mouse_coordinates').innerHTML = `Mouse position: ${lng.toFixed(5)}, ${lat.toFixed(5)}`;
-    });
+		document.getElementById('mouse_coordinates').innerHTML = `Mouse position: ${lng.toFixed(5)}, ${lat.toFixed(5)}`;
+	});
 
 	// Fetch per ottenere i timestampId del layer pred
 	let predLayer_timestampIds = [];
 	const fetchPredTimestamps = async () => {
-		
+
 		// Recupera i timestampId del layer ellipsis e chiama la funzione per aggiungere il layer
-		const pred_url = "https://api.ellipsis-drive.com/v3/path/"+prediction_pathId;
+		const pred_url = "https://api.ellipsis-drive.com/v3/path/" + prediction_pathId;
 		// console.log("Fetching timestamps from:", pred_url);
 		fetch(pred_url).then(response => {
 			return response.json();
@@ -295,10 +295,10 @@ const initMap = () => {
 			// console.log('Risposta dal server:', data.raster.timestamps);
 			predLayer_timestampIds = []; // Reset the array to avoid duplicates
 			const responseData = data.raster.timestamps;
-            predLayer_timestampIds.push(...responseData.map(item => item));
-            
-            const last_timestampId = responseData[responseData.length - 1].id;
-            createEllipsisRasterLayer(last_timestampId);
+			predLayer_timestampIds.push(...responseData.map(item => item));
+
+			const last_timestampId = responseData[responseData.length - 1].id;
+			createEllipsisRasterLayer(last_timestampId);
 
 			if (marker) {
 				const coords = marker.getLngLat();
@@ -310,16 +310,16 @@ const initMap = () => {
 			if (uploadedFile) {
 				handleCsvFile(uploadedFile);
 			}
-		});	
+		});
 
 	}
 
-    // Aggiungi il layer di Ellipsis
-    // - Se non viene passato un timestampId, lo inizializzo sul default di ellipsis (più recente)
-    const createEllipsisRasterLayer = async (timestampId) => {
-        
+	// Aggiungi il layer di Ellipsis
+	// - Se non viene passato un timestampId, lo inizializzo sul default di ellipsis (più recente)
+	const createEllipsisRasterLayer = async (timestampId) => {
+
 		timestampId = timestampId || '';
-			
+
 		if (map.getLayer('predLayer')) {
 			map.removeLayer('predLayer'); // Rimuovi layer
 			map.removeSource('predLayer_source'); // Rimuovi la sorgente
@@ -329,7 +329,7 @@ const initMap = () => {
 			map.removeLayer('boundaries'); // Rimuovi layer
 			map.removeSource('boundaries_source'); // Rimuovi la sorgente
 		}
-			
+
 		const predLayer = await MapboxgljsEllipsis.AsyncEllipsisRasterLayer({
 			pathId: prediction_pathId,
 			timestampId: timestampId,
@@ -338,24 +338,24 @@ const initMap = () => {
 
 		predLayer.id = 'predLayer'; // Assegna un id al layer
 		predLayer.addTo(map);
-		map.setPaintProperty('predLayer', 'raster-opacity', document.querySelector("#pred_opacity_slider").value*0.01);
+		map.setPaintProperty('predLayer', 'raster-opacity', document.querySelector("#pred_opacity_slider").value * 0.01);
 
 		// 🚀 sposta in cima i boundaries
 		const layersOnTheMap = map.getStyle().layers;
 		layersOnTheMap
-		.filter(layer => layer.id.startsWith('boundaries_'))  
-		.forEach(layer => {
-			// console.log("Spostando layer:", layer.id);
-			map.moveLayer(layer.id);  
-		});
+			.filter(layer => layer.id.startsWith('boundaries_'))
+			.forEach(layer => {
+				// console.log("Spostando layer:", layer.id);
+				map.moveLayer(layer.id);
+			});
 
 		// 🚀 sposta in cima i punti csv
 		layersOnTheMap
-		.filter(layer => layer.id.startsWith('csv-points'))  
-		.forEach(layer => {
-			// console.log("Spostando layer:", layer.id);
-			map.moveLayer(layer.id);  
-		});
+			.filter(layer => layer.id.startsWith('csv-points'))
+			.forEach(layer => {
+				// console.log("Spostando layer:", layer.id);
+				map.moveLayer(layer.id);
+			});
 	};
 
 	// Basemap toggler
@@ -384,23 +384,23 @@ const initMap = () => {
 	// Opacity slider
 	document.querySelector("#pred_opacity_slider").addEventListener("calciteSliderChange", (e) => {
 		const opacity_value = e.target.value;
-		map.setPaintProperty('predLayer', 'raster-opacity', opacity_value*0.01);
+		map.setPaintProperty('predLayer', 'raster-opacity', opacity_value * 0.01);
 	});
 
 	// Opacity slider
 	document.querySelector("#pred_sel_opacity_slider").addEventListener("calciteSliderChange", (e) => {
 		const opacity_value = e.target.value;
-		map.setPaintProperty('predLayer_selection', 'raster-opacity', opacity_value*0.01);
+		map.setPaintProperty('predLayer_selection', 'raster-opacity', opacity_value * 0.01);
 	});
 
 
 	// ComboBox change
-	document.querySelector("#pred_combobox").addEventListener("calciteComboboxChange", (e)=>{
+	document.querySelector("#pred_combobox").addEventListener("calciteComboboxChange", (e) => {
 		console.log(e.target.value);
 		prediction_pathId = e.target.value;
-		
+
 		let selected_year = document.querySelector("#year_slider").value.toString();
-        let selected_timestampId = predLayer_timestampIds.find(item => item.description === selected_year);
+		let selected_timestampId = predLayer_timestampIds.find(item => item.description === selected_year);
 		console.log(selected_timestampId)
 
 		// Attiva o disattiva il bottone per chiamare il plot delle variabili
@@ -409,24 +409,24 @@ const initMap = () => {
 		} else {
 			document.querySelector("#plot_variables_btn").removeAttribute("disabled");
 		}
-		
+
 		clearpredLayerSelection();
 		fetchPredTimestamps();
 
 	});
-	
-    // Slider change
-	document.querySelector("#year_slider").addEventListener("calciteSliderChange", (e)=>{
+
+	// Slider change
+	document.querySelector("#year_slider").addEventListener("calciteSliderChange", (e) => {
 		let value = e.target.value;
 		let selected_year = value.toString();
-        let selected_timestampId = predLayer_timestampIds.find(item => item.description === selected_year);
-        clearpredLayerSelection()
-        createEllipsisRasterLayer(selected_timestampId.id);
+		let selected_timestampId = predLayer_timestampIds.find(item => item.description === selected_year);
+		clearpredLayerSelection()
+		createEllipsisRasterLayer(selected_timestampId.id);
 		if (marker) {
-            const coords = marker.getLngLat();
-            const { lng, lat } = coords;
-            analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
-        }
+			const coords = marker.getLngLat();
+			const { lng, lat } = coords;
+			analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
+		}
 
 		if (uploadedFile) {
 			handleCsvFile(uploadedFile);
@@ -435,7 +435,7 @@ const initMap = () => {
 
 	// UPLOAD CSV LAYER
 	// ===========================================================================================
-	
+
 	const handleCsvFile = async (file) => {
 		/*if (marker) {
 			marker.remove();
@@ -476,7 +476,7 @@ const initMap = () => {
 			let selected_timestampId = predLayer_timestampIds.find(item => String(item.description) === String(selected_year));
 			const getLocationInfoResult = await getLocationInfo(prediction_pathId, selected_timestampId.id, locations);
 			console.log("getLocationInfo response:", getLocationInfoResult);
-			
+
 			// 4) Aggiungi proprietà ai features del GeoJSON
 
 			// Etichette per pred + anno
@@ -607,7 +607,7 @@ const initMap = () => {
 
 					document.querySelector("#lng_input").value = feature_lng.toString();
 					document.querySelector("#lat_input").value = feature_lat.toString();
-					
+
 					analyseRaster(parseFloat(feature_lng), parseFloat(feature_lat), predLayer_timestampIds, selected_year);
 				});
 
@@ -618,8 +618,9 @@ const initMap = () => {
 			geojson.features.forEach(f => bounds.extend(f.geometry.coordinates));
 			if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 80 });
 
-			// Abilita il bottone per scaricare il CSV arricchito
-			document.querySelector("#download_csv_btn").disabled = false;
+			// Abilita il bottone per scaricare il dato arricchito
+			document.querySelector("#download_xlsx_btn").disabled = false;
+			document.querySelector("#download_geojson_btn").disabled = false;
 
 		} catch (err) {
 			console.error(err);
@@ -637,7 +638,7 @@ const initMap = () => {
 			uploadedFile = file;
 			handleCsvFile(file);
 		}
-		
+
 	});
 
 	document.querySelector("#clear_csv_btn").addEventListener("click", () => {
@@ -686,25 +687,33 @@ const initMap = () => {
 			speed: 0.8
 		});
 
-		// Disabilita il bottone per scaricare il CSV arricchito
-		document.querySelector("#download_csv_btn").disabled = true;
+		// Disabilita il bottone per scaricare il dato arricchito
+		document.querySelector("#download_xlsx_btn").disabled = true;
+		document.querySelector("#download_geojson_btn").disabled = true;
 
 	});
 
-	// Download CSV arricchito
-	document.querySelector("#download_csv_btn").addEventListener("click", () => {
+	// Download XLSX arricchito
+	document.querySelector("#download_xlsx_btn").addEventListener("click", () => {
+		if (!processedCsvGeojson) {
+			alert("No enriched data available.");
+			return;
+		}
+		geojsonToXLSX(processedCsvGeojson, "enriched_points.xlsx");
+	});
+
+
+	// Download GeoJSON arricchito
+	document.querySelector("#download_geojson_btn").addEventListener("click", () => {
 
 		if (!processedCsvGeojson) {
-			alert("No enriched CSV available to download.");
+			alert("No enriched GeoJSON available to download.");
 			return;
 		}
 
-		const csv = geojsonToCSV(processedCsvGeojson);
-		downloadCSV(csv, "updated_points.csv");
+		downloadGeoJSON(processedCsvGeojson, "enriched_points.geojson");
 	});
 
-	
-    
 }
 
 export { initMap, map, marker, prediction_pathId };
