@@ -76,7 +76,9 @@
                       icon-start="upload-to">
 
             <calcite-notice open kind="brand" icon="exclamation-point-f" scale="s" style="margin-bottom: 0.5rem;">
-              <div slot="message">The file must contain the 'lat'/'lon' or 'latitude'/'longitude' columns</div>
+              <div slot="message">The file must contain the <b>lat</b>/<b>lon</b> or <b>latitude</b>/<b>longitude</b> columns.<br/>
+                For best results, use a <b>simple CSV</b> (e.g., one row per point and no complex formatted fields with embedded commas or multi-line notes).
+              </div>
             </calcite-notice>
               
             <calcite-input id="input_file" type="file" accept="csv" icon placeholder="Enter your data">
