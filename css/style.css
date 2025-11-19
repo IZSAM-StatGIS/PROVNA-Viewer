@@ -21,6 +21,7 @@ html, body {
 /* Stile per l'indicatore di caricamento delle info per i punti del file CSV */
 #upload_status {
   transition: opacity 0.3s ease-in-out;
+  font-size: 12px;
 }
 
 .upload-blink {

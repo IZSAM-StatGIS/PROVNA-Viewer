@@ -130,7 +130,7 @@ const getLocationInfo = async (pathId, timestampId, locations) => {
   }
 
   const statusEl = document.querySelector("#upload_status");
-  statusEl.textContent = `Fetching location info for ${locations.length} points...`;
+  statusEl.textContent = `Retrieving ecoregions data for ${locations.length} points...`;
   statusEl.classList.add("upload-blink");
 
   const MAX_CHUNK = 30;
@@ -170,7 +170,7 @@ const getLocationInfo = async (pathId, timestampId, locations) => {
     raw.forEach(item => results.push(item[0]));
 
     processed += chunk.length;
-    statusEl.textContent = `Fetching location info for ${locations.length} points... (${processed}/${locations.length})`;
+    statusEl.textContent = `Retrieving ecoregions data for ${locations.length} points... (${processed}/${locations.length})`;
   }
 
   // Stop blink
@@ -180,7 +180,7 @@ const getLocationInfo = async (pathId, timestampId, locations) => {
   const zeros = results.filter(v => v === 0).length;
 
   // Messaggio finale
-  let msg = `${total} points loaded`;
+  let msg = `${total} points analyzed`;
   if (zeros > 0) msg += ` (${zeros} outside valid raster area)`;
 
   statusEl.textContent = msg;
