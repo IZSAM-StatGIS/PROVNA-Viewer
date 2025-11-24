@@ -1,6 +1,6 @@
 # PROVNA-Viewer
 
-Applicazione web per la visualizzazione e l'analisi dei dati PROVNA. Basata su MapLibre GL, Ellipsis JS ed Esri Calcite Components, offre strumenti per navigare la mappa, interrogare i layer predittivi e arricchire dati puntuali caricati dall'utente.
+Applicazione web per la visualizzazione e l'analisi dei dati PROVNA su Ellipsis Drive. Basata su MapLibre GL, eCharts JS ed Esri Calcite Components, offre strumenti per navigare la mappa, interrogare i layer predittivi e arricchire dati puntuali caricati dall'utente.
 
 ## Funzionalità principali
 - Selettore di basemap (satellitare, OpenStreetMap, dark) con controlli di navigazione e scala.
