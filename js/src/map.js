@@ -96,7 +96,7 @@ const initMap = () => {
 
 		// Vector layer
 		const boundaries = new MapboxgljsEllipsis.EllipsisVectorLayer({
-			pathId: '9f2d2a7f-43e9-4ccf-8526-0df2a9882b4f',
+			pathId: 'd2de6dd9-0750-40e1-b2dd-45af8a7a9d0a',
 			id: 'boundaries',
 			onlyTiles: true,
 			// style: 'a1c6ef13-7cf1-4ecf-97fb-f8f28f6dcbd4',
