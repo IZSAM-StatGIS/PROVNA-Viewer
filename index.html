@@ -63,8 +63,9 @@
         <calcite-block expanded collapsible heading="Image/Year" description="Select the image and drag the slider to change year" icon-start="image-collection-explorer">
 
           <calcite-combobox clear-disabled selection-mode="single-persist" id="pred_combobox" scale="s" width="full">
-            <calcite-combobox-item selected value="be1e61d7-f9c7-488c-985f-cd97f7e7a04b" heading="Ecoregions - 55 classes"></calcite-combobox-item>
-            <calcite-combobox-item value="1d215c20-45e1-4e9f-b9d3-df66134586b3" heading="Ecoregions - 1600 classes"></calcite-combobox-item>
+            <calcite-combobox-item selected value="5c59b5a3-a6f6-4697-a2a9-b7b215d1f862" heading="Ecoregions - 3600 classes"></calcite-combobox-item>
+            <!-- calcite-combobox-item value="be1e61d7-f9c7-488c-985f-cd97f7e7a04b" heading="Ecoregions - 55 classes"></calcite-combobox-item>
+            <calcite-combobox-item value="1d215c20-45e1-4e9f-b9d3-df66134586b3" heading="Ecoregions - 1600 classes"></calcite-combobox-item -->
           </calcite-combobox>
 
           <calcite-slider id="year_slider" label-handles ticks="1" label-ticks min="2018" max="2024" value="2024" step="1"></calcite-slider>
@@ -126,7 +127,7 @@
                     placement="top-start" close-disabled drag-enabled kind="brand"
                     style="--calcite-dialog-offset-y: 50px !important; --calcite-dialog-offset-x: 25px !important; --calcite-dialog-size-x: 250px !important">
 
-      <calcite-block expanded collapsible heading="Basemap" description="Change the basemap" icon-start="basemap">
+      <calcite-block collapsible heading="Basemap" description="Change the basemap" icon-start="basemap">
         <calcite-radio-button-group id="basemap_toggler" name="basemap_toggler" layout="vertical" scale="l">
           <calcite-label layout="inline">
             <calcite-radio-button value="sat" checked></calcite-radio-button>
@@ -152,7 +153,7 @@
         </calcite-block-section> 
         <calcite-block-section text="Selection color" icon-start="paint-bucket">
           <div style="display: flex; justify-content: center;margin-bottom: 0.5rem;">
-            <calcite-color-picker id="pred_sel_color" scale="m" value="#00FFFF" saved-disabled></calcite-color-picker>
+            <calcite-color-picker id="pred_sel_color" scale="m" value="#FFE700" saved-disabled></calcite-color-picker>
           </div>
           <calcite-button id="pred_sel_color_reset" scale="s" icon-start="reset" appearance="outline" width="full">Reset selection color</calcite-button>
         </calcite-block-section>

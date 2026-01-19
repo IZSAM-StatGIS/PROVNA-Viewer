@@ -1,5 +1,6 @@
 import colormap55 from '../../assets/ct55.js';
 import colormap1600 from '../../assets/ct1600.js';
+import colormap3600 from '../../assets/ct3600.js';
 
 let myChart;
 const drawChart = (data, year) => {
@@ -13,6 +14,10 @@ const drawChart = (data, year) => {
 		colormap1600.map(entry => [entry.value, entry.target.color])
 	);
 
+	const colorMap3600 = new Map(
+		colormap3600.map(entry => [entry.value, entry.target.color])
+	);
+
 	let colorMap;
 	// Seleziona la colormap in base al raster selezionato
 	let selected_raster = document.querySelector("#pred_combobox").value;
@@ -22,6 +27,9 @@ const drawChart = (data, year) => {
 	} else if (selected_raster === '1d215c20-45e1-4e9f-b9d3-df66134586b3') {
 		// Colormap 1600
 		colorMap = colorMap1600;
+	} else {
+		// Colormap 3600
+		colorMap = colorMap3600;
 	}
 
 

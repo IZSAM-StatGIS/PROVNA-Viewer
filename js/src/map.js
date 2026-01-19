@@ -1,12 +1,12 @@
 import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
 import { readCSV, buildLocationsFromGeoJSON, getLocationInfo, geojsonToXLSX, downloadGeoJSON } from "./csv-layer.js";
 
-let map, marker, prediction_pathId = 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b';
+let map, marker, prediction_pathId = '5c59b5a3-a6f6-4697-a2a9-b7b215d1f862';
 const initMap = () => {
 	map = new maplibregl.Map({
 		container: 'map', // container id
-		center: [11, 28], // starting position [lng, lat]
-		zoom: 3.5, // starting zoom
+		center: [24, 42], // starting position [lng, lat]
+		zoom: 3.0, // starting zoom
 		style: {
 			version: 8,
 			sources: {},
@@ -265,7 +265,7 @@ const initMap = () => {
 	});
 
 	document.querySelector("#pred_sel_color_reset").addEventListener("click", () => {
-		document.querySelector("#pred_sel_color").value = '#00FFFF'; // Reset to default color
+		document.querySelector("#pred_sel_color").value = '#FFE700'; // Reset to default color
 		if (marker) {
 			// console.log("Color changed:", e.target.value);
 			// console.log(marker.getLngLat())
@@ -480,8 +480,8 @@ const initMap = () => {
 
 			// Etichette per pred + anno
 			const predType =
-				prediction_pathId === "be1e61d7-f9c7-488c-985f-cd97f7e7a04b"
-					? "Pred55"
+				prediction_pathId === "5c59b5a3-a6f6-4697-a2a9-b7b215d1f862"
+					? "Pred3600"
 					: "Pred1600";
 
 			const unifiedAttrName = `Ecoregion (${predType} - ${selected_year})`;
