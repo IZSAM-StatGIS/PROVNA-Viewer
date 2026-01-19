@@ -1,17 +1,12 @@
-import colormap55 from '../../assets/ct55.js';
-import colormap1600 from '../../assets/ct1600.js';
+import colormap94 from '../../assets/ct94.js';
 import colormap3600 from '../../assets/ct3600.js';
 
 let myChart;
 const drawChart = (data, year) => {
 	
 	// Crea una lookup Map da valore a colore
-	const colorMap55 = new Map(
-		colormap55.map(entry => [entry.value, entry.target.color])
-	);
-
-	const colorMap1600 = new Map(
-		colormap1600.map(entry => [entry.value, entry.target.color])
+	const colorMap94 = new Map(
+		colormap94.map(entry => [entry.value, entry.target.color])
 	);
 
 	const colorMap3600 = new Map(
@@ -21,12 +16,9 @@ const drawChart = (data, year) => {
 	let colorMap;
 	// Seleziona la colormap in base al raster selezionato
 	let selected_raster = document.querySelector("#pred_combobox").value;
-	if (selected_raster === 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b') {
-		// Colormap 55
-		colorMap = colorMap55;
-	} else if (selected_raster === '1d215c20-45e1-4e9f-b9d3-df66134586b3') {
-		// Colormap 1600
-		colorMap = colorMap1600;
+	if (selected_raster === '130cddc5-ce47-45b2-abfe-0961e3e597cd') {
+		// Colormap 94
+		colorMap = colorMap94;
 	} else {
 		// Colormap 3600
 		colorMap = colorMap3600;

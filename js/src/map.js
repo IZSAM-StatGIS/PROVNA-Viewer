@@ -1,7 +1,7 @@
 import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
 import { readCSV, buildLocationsFromGeoJSON, getLocationInfo, geojsonToXLSX, downloadGeoJSON } from "./csv-layer.js";
 
-let map, marker, prediction_pathId = '5c59b5a3-a6f6-4697-a2a9-b7b215d1f862';
+let map, marker, prediction_pathId = '130cddc5-ce47-45b2-abfe-0961e3e597cd';
 const initMap = () => {
 	map = new maplibregl.Map({
 		container: 'map', // container id
@@ -44,27 +44,6 @@ const initMap = () => {
 			minzoom: 0,
 			maxzoom: 19
 		});
-
-		// Aggiunge le label esri
-		/*
-		map.addSource('arcgis-labels', {
-			type: 'raster',
-			tiles: [
-				'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
-			],
-			tileSize: 256,
-			attribution:
-				'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, etc.'
-		});
-
-		map.addLayer({
-			id: 'arcgis-labels-layer',
-			type: 'raster',
-			source: 'arcgis-labels',
-			minzoom: 0,
-			maxzoom: 19
-		});
-		*/
 
 		// Aggiunge il layer OSM
 		map.addSource('osm-basemap', {
@@ -404,7 +383,7 @@ const initMap = () => {
 		console.log(selected_timestampId)
 
 		// Attiva o disattiva il bottone per chiamare il plot delle variabili
-		if (prediction_pathId === 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b') { // Pred55
+		if (prediction_pathId === '130cddc5-ce47-45b2-abfe-0961e3e597cd') { // Pred94
 			document.querySelector("#plot_variables_btn").setAttribute("disabled", true);
 		} else {
 			document.querySelector("#plot_variables_btn").removeAttribute("disabled");
