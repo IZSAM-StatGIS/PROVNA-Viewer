@@ -6,11 +6,11 @@ const drawChart = (data, year) => {
 	
 	// Crea una lookup Map da valore a colore
 	const colorMap94 = new Map(
-		colormap94.map(entry => [entry.value, entry.target.color, entry.exemplar])
+		colormap94.map(entry => [entry.value, { color: entry.target.color, exemplar: entry.exemplar }])
 	);
 
 	const colorMap3600 = new Map(
-		colormap3600.map(entry => [entry.value, entry.target.color])
+		colormap3600.map(entry => [entry.value, { color: entry.target.color }])
 	);
 
 	let colorMap;
@@ -35,8 +35,15 @@ const drawChart = (data, year) => {
 	var option = {
 		tooltip: {
 			trigger: 'axis',
-				axisPointer: {
-					type: 'shadow' // 'line', 'shadow', 'none', 'cross'
+			axisPointer: {
+				type: 'shadow' // 'line', 'shadow', 'none', 'cross'
+			},
+			formatter: (params) => {
+				const point = Array.isArray(params) ? params[0] : params;
+				const value = Math.round(point.value);
+				const meta = colorMap.get(value);
+				const exemplar = meta && meta.exemplar ? meta.exemplar : null;
+				return exemplar ? `Ecoregion: ${value}<br/>Exemplar: ${exemplar}` : `Ecoregion: ${value}`;
 			}
 		},
 		xAxis: {
@@ -44,7 +51,7 @@ const drawChart = (data, year) => {
 			data: years
 		},
 		yAxis: {
-			name: 'Ecoregion Class',
+			name: 'Ecoregion',
 			nameLocation: 'center',   	// 👈 posizione centrata rispetto all’asse
 			nameRotate: 90,          	// 👈 verticale, lettura top-to-bottom
 			nameGap: 25,              	// 👈 distanza dalla scala
@@ -69,7 +76,8 @@ const drawChart = (data, year) => {
             itemStyle: {
                 color: (params) => {
 					const value = Math.round(params.value);
-					return colorMap.get(value) || '#ccc';
+					const meta = colorMap.get(value);
+					return (meta && meta.color) || '#ccc';
 				}
             },
 			markLine: {
