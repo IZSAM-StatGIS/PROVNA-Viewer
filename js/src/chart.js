@@ -1,4 +1,4 @@
-import colormap94 from '../../assets/ct94.js';
+import colormap94 from '../../assets/ct94_full.js';
 import colormap3600 from '../../assets/ct3600.js';
 
 let myChart;
@@ -6,7 +6,7 @@ const drawChart = (data, year) => {
 	
 	// Crea una lookup Map da valore a colore
 	const colorMap94 = new Map(
-		colormap94.map(entry => [entry.value, entry.target.color])
+		colormap94.map(entry => [entry.value, entry.target.color, entry.exemplar])
 	);
 
 	const colorMap3600 = new Map(
