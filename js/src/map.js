@@ -461,7 +461,7 @@ const initMap = () => {
 			const predType =
 				prediction_pathId === "5c59b5a3-a6f6-4697-a2a9-b7b215d1f862"
 					? "Pred3600"
-					: "Pred1600";
+					: "Pred94";
 
 			const unifiedAttrName = `Ecoregion (${predType} - ${selected_year})`;
 
