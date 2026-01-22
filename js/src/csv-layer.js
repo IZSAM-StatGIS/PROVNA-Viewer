@@ -95,12 +95,16 @@ const readCSV = (file) => {
 const buildLocationsFromGeoJSON = (geojson) => {
 
   const locations = [];
+  const findPropKey = (props, names) => {
+    const lowerNames = names.map(n => n.toLowerCase());
+    return Object.keys(props).find(k => lowerNames.includes(k.trim().toLowerCase()));
+  };
 
   geojson.features.forEach(feature => {
 
     // noms dinamici: lat/latitude, lon/lng/longitude
-    const latField = ["lat", "latitude"].find(f => f in feature.properties);
-    const lonField = ["lon", "lng", "longitude"].find(f => f in feature.properties);
+    const latField = findPropKey(feature.properties, ["lat", "latitude"]);
+    const lonField = findPropKey(feature.properties, ["lon", "lng", "longitude"]);
 
     if (!latField || !lonField) return; // safety
 

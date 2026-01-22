@@ -564,9 +564,13 @@ const initMap = () => {
 
 					const feature = e.features[0];
 
-					// recupera il nome effettivo delle colonne lat/lon
-					const latField = ["lat", "latitude"].find(f => f in feature.properties);
-					const lonField = ["lon", "lng", "longitude"].find(f => f in feature.properties);
+					// recupera il nome effettivo delle colonne lat/lon (case-insensitive)
+					const findPropKey = (props, names) => {
+						const lowerNames = names.map(n => n.toLowerCase());
+						return Object.keys(props).find(k => lowerNames.includes(k.trim().toLowerCase()));
+					};
+					const latField = findPropKey(feature.properties, ["lat", "latitude"]);
+					const lonField = findPropKey(feature.properties, ["lon", "lng", "longitude"]);
 
 					// valori originali dal CSV
 					const feature_lat = feature.properties[latField];
