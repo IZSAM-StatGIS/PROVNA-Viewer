@@ -262,6 +262,7 @@ const initMap = () => {
 
 	// Fetch per ottenere i timestampId del layer pred
 	let predLayer_timestampIds = [];
+
 	const fetchPredTimestamps = async () => {
 
 		// Recupera i timestampId del layer ellipsis e chiama la funzione per aggiungere il layer
@@ -282,7 +283,7 @@ const initMap = () => {
 			if (marker) {
 				const coords = marker.getLngLat();
 				const { lng, lat } = coords;
-				let selected_year = document.querySelector("#year_slider").value.toString();
+				const selected_year = document.querySelector("#year_slider").value.toString();
 				analyseRaster(lng, lat, predLayer_timestampIds, selected_year);
 			}
 
@@ -378,10 +379,6 @@ const initMap = () => {
 		console.log(e.target.value);
 		prediction_pathId = e.target.value;
 
-		let selected_year = document.querySelector("#year_slider").value.toString();
-		let selected_timestampId = predLayer_timestampIds.find(item => item.description === selected_year);
-		console.log(selected_timestampId)
-
 		// Attiva o disattiva il bottone per chiamare il plot delle variabili
 		if (prediction_pathId === '130cddc5-ce47-45b2-abfe-0961e3e597cd') { // Pred94
 			document.querySelector("#plot_variables_btn").setAttribute("disabled", true);
@@ -399,6 +396,7 @@ const initMap = () => {
 		let value = e.target.value;
 		let selected_year = value.toString();
 		let selected_timestampId = predLayer_timestampIds.find(item => item.description === selected_year);
+		if (!selected_timestampId) return;
 		clearpredLayerSelection()
 		createEllipsisRasterLayer(selected_timestampId.id);
 		if (marker) {

@@ -2,7 +2,16 @@ import colormap94 from '../../assets/ct94_full.js';
 import colormap3600 from '../../assets/ct3600.js';
 
 let myChart;
-const drawChart = (data, year) => {
+const drawChart = (data, year, timestamps = []) => {
+	const extractTimestampYear = (timestamp) => {
+		const raw = String(timestamp?.description ?? "").trim();
+		const direct = Number(raw);
+		if (Number.isInteger(direct) && direct >= 1900 && direct <= 2100) {
+			return String(direct);
+		}
+		const match = raw.match(/\b(19|20)\d{2}\b/);
+		return match ? match[0] : null;
+	};
 	
 	// Crea una lookup Map da valore a colore
 	const colorMap94 = new Map(
@@ -24,9 +33,20 @@ const drawChart = (data, year) => {
 		colorMap = colorMap3600;
 	}
 
+	const timeline = timestamps
+		.map(item => ({
+			id: item.id,
+			year: extractTimestampYear(item)
+		}))
+		.filter(item => Boolean(item.year))
+		.sort((a, b) => Number(a.year) - Number(b.year));
 
-	let chartData = data.map(item => item.result[0].statistics.mean);
-	let years = ['2018', '2019', '2020', '2021', '2022', '2023', '2024'];
+	const valuesByTimestampId = new Map(
+		data.map(item => [item.timestamp.id, item.result?.[0]?.statistics?.mean ?? null])
+	);
+
+	const years = timeline.map(item => item.year);
+	const chartData = timeline.map(item => valuesByTimestampId.get(item.id) ?? null);
 	// let year_index = years.indexOf(year.toString());
 
 	// console.log(year, year_index)

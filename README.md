@@ -1,23 +1,23 @@
 # PROVNA-Viewer
 
-Applicazione web per la visualizzazione e l'analisi dei dati PROVNA su Ellipsis Drive. Basata su MapLibre GL, eCharts JS ed Esri Calcite Components, offre strumenti per navigare la mappa, interrogare i layer predittivi e arricchire dati puntuali caricati dall'utente.
+Web application for visualizing and analyzing PROVNA data on Ellipsis Drive. Built with MapLibre GL, Apache ECharts, and Esri Calcite Components, it provides tools to navigate the map, query predictive layers, and enrich user-uploaded point data.
 
-## Funzionalità principali
-- Selettore di basemap (satellitare, OpenStreetMap, dark) con controlli di navigazione e scala.
-- Visualizzazione dei layer predittivi PROVNA (Pred 55 e Pred 1600) con selezione dell'anno (2018‑2024) e regolazione dell'opacità/colore delle selezioni.
-- Ispezione puntuale: click sulla mappa o inserimento di coordinate per ottenere il cluster/ecoregione e un grafico delle serie temporali.
-- Pulsante EcoPath per aprire la visualizzazione dedicata delle variabili nel punto selezionato.
-- Upload di punti in CSV (colonne `lat`/`lon` o `latitude`/`longitude`), arricchimento automatico con il valore di ecoregione e download dei dati in XLSX o GeoJSON.
-- Gestione dinamica dei popup e del marker per facilitare l'esplorazione.
+## Main Features
+- Basemap selector (satellite, OpenStreetMap, dark) with navigation and scale controls.
+- Display of PROVNA predictive layers (Pred 55 and Pred 1600), with year selection (2018-2024) and opacity/selection-color controls.
+- Point inspection: click on the map or enter coordinates to retrieve the cluster/ecoregion and view a time-series chart.
+- EcoPath button to open the dedicated variable view for the selected point.
+- CSV point upload (`lat`/`lon` or `latitude`/`longitude` columns), automatic enrichment with the ecoregion value, and data download as XLSX or GeoJSON.
+- Dynamic popup and marker handling to make exploration easier.
 
-## Tech stack
-- MapLibre GL JS per la mappa.
-- Ellipsis JS per i layer raster/vettoriali.
-- Esri Calcite Components per l'interfaccia.
-- Apache ECharts per i grafici e PapaParse/SheetJS per la gestione dei file.
+## Tech Stack
+- MapLibre GL JS for the map.
+- Ellipsis JS for raster/vector layers.
+- Esri Calcite Components for the interface.
+- Apache ECharts for charts, and PapaParse/SheetJS for file handling.
 
 ## Packaging
-Generare il war con il comando:
+Generate the WAR file with:
 
 ```bash
 & "C:\Users\a.dilorenzo\Sviluppo\Java\jdk-16_windows-x64_bin\jdk-16\bin\jar.exe" cvf gis_provna_viewer.war *
