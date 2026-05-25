@@ -94,25 +94,21 @@ const initMap = () => {
 			layout: { visibility: 'none' } // inizialmente nascosto
 		});
 
-		// Vector layer
+		// Vector layers
 		const boundaries = new MapboxgljsEllipsis.EllipsisVectorLayer({
 			pathId: '9f2d2a7f-43e9-4ccf-8526-0df2a9882b4f',
 			id: 'boundaries',
 			onlyTiles: true,
-			// style: 'a1c6ef13-7cf1-4ecf-97fb-f8f28f6dcbd4',
-			/* filter: [
-				"any",
-				["==", ["get", "country_co"], "MO"],
-				["==", ["get", "country_co"], "WI"],
-				["==", ["get", "country_co"], "AG"],
-				["==", ["get", "country_co"], "MR"],
-				["==", ["get", "country_co"], "LY"],
-				["==", ["get", "country_co"], "TS"],
-				["==", ["get", "country_co"], "EG"],
-			],*/
 		})
 
 		boundaries.addTo(map)
+
+		const ws_line = new MapboxgljsEllipsis.EllipsisVectorLayer({
+			pathId: 'adead386-9b18-4a5e-8a3e-993726207e87',
+			id: 'ws_line',
+			onlyTiles: true,
+		})
+		ws_line.addTo(map)
 
 		fetchPredTimestamps();
 
