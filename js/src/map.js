@@ -1,5 +1,6 @@
 import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
 import { readCSV, buildLocationsFromGeoJSON, getLocationInfo, geojsonToXLSX, downloadGeoJSON } from "./csv-layer.js";
+import { enforceOverlayOrder } from "./layer-order.js";
 
 let map, marker, prediction_pathId = 'be1e61d7-f9c7-488c-985f-cd97f7e7a04b';
 const initMap = () => {
@@ -109,6 +110,7 @@ const initMap = () => {
 			onlyTiles: true,
 		})
 		ws_line.addTo(map)
+		enforceOverlayOrder(map);
 
 		fetchPredTimestamps();
 
@@ -321,10 +323,6 @@ const initMap = () => {
 			map.removeSource('predLayer_source'); // Rimuovi la sorgente
 		}
 
-		if (map.getLayer('boundaries')) {
-			map.removeLayer('boundaries'); // Rimuovi layer
-			map.removeSource('boundaries_source'); // Rimuovi la sorgente
-		}
 
 		const predLayer = await MapboxgljsEllipsis.AsyncEllipsisRasterLayer({
 			pathId: prediction_pathId,
@@ -336,22 +334,7 @@ const initMap = () => {
 		predLayer.addTo(map);
 		map.setPaintProperty('predLayer', 'raster-opacity', document.querySelector("#pred_opacity_slider").value * 0.01);
 
-		// 🚀 sposta in cima i boundaries
-		const layersOnTheMap = map.getStyle().layers;
-		layersOnTheMap
-			.filter(layer => layer.id.startsWith('boundaries_'))
-			.forEach(layer => {
-				// console.log("Spostando layer:", layer.id);
-				map.moveLayer(layer.id);
-			});
-
-		// 🚀 sposta in cima i punti csv
-		layersOnTheMap
-			.filter(layer => layer.id.startsWith('csv-points'))
-			.forEach(layer => {
-				// console.log("Spostando layer:", layer.id);
-				map.moveLayer(layer.id);
-			});
+		enforceOverlayOrder(map);
 	};
 
 	// Basemap toggler
@@ -500,6 +483,7 @@ const initMap = () => {
 					0, "#A0A0A0",
 					"#007cbf"
 				]);
+				enforceOverlayOrder(map);
 
 			} else {
 				map.addSource("csv-points", {
@@ -607,6 +591,7 @@ const initMap = () => {
 				});
 
 			}
+			enforceOverlayOrder(map);
 
 			// fitBounds sui punti
 			const bounds = new maplibregl.LngLatBounds();
@@ -712,3 +697,4 @@ const initMap = () => {
 }
 
 export { initMap, map, marker, prediction_pathId };
+
