@@ -1,4 +1,4 @@
-import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
+﻿import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
 import { readCSV, buildLocationsFromGeoJSON, getLocationInfo, geojsonToXLSX, downloadGeoJSON } from "./csv-layer.js";
 import { enforceOverlayOrder } from "./layer-order.js";
 
@@ -84,7 +84,7 @@ const initMap = () => {
 		// Aggiunge il layer OSM
 		map.addSource('dark-matter', {
 			type: 'raster',
-			tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'],
+			tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_31g1_1_25bb5a1640b5d45044b37c37'],
 			tileSize: 256,
 			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
 		});
