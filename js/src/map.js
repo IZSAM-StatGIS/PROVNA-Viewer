@@ -1,4 +1,4 @@
-import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
+﻿import { analyseRaster, clearpredLayerSelection } from "./analyses.js";
 import { readCSV, buildLocationsFromGeoJSON, getLocationInfo, geojsonToXLSX, downloadGeoJSON } from "./csv-layer.js";
 import { enforceOverlayOrder } from "./layer-order.js";
 
@@ -473,7 +473,7 @@ const initMap = () => {
 					type: "circle",
 					source: "csv-points",
 					paint: {
-						"circle-radius": 10,
+						"circle-radius": 6,
 						"circle-color": "#ffffff"
 					}
 				});
@@ -484,7 +484,7 @@ const initMap = () => {
 					type: "circle",
 					source: "csv-points",
 					paint: {
-						"circle-radius": 8,
+						"circle-radius": 5,
 						"circle-color": [
 							"match",
 							["get", unifiedAttrName],   // 👈 NOME DINAMICO DELL'ATTRIBUTO
