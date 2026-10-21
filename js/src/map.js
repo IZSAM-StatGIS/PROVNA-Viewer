@@ -391,7 +391,27 @@ const initMap = () => {
 	// UPLOAD CSV LAYER
 	// ===========================================================================================
 
+	let csvPointRadius = 5;
+	let csvLoadVersion = 0;
+	const csvRadiusControl = document.querySelector("#csv_radius_control");
+	const csvRadiusSlider = document.querySelector("#csv_radius_slider");
+	const syncCsvRadiusControl = () => {
+		csvRadiusControl.hidden = !(map.getLayer("csv-points") && map.getLayer("csv-points-outline"));
+	};
+	const updateCsvPointRadius = (event) => {
+		const radius = Number(event.target.value);
+		if (!Number.isInteger(radius) || radius < 2 || radius > 15) return;
+		csvPointRadius = radius;
+		if (map.getLayer("csv-points") && map.getLayer("csv-points-outline")) {
+			map.setPaintProperty("csv-points", "circle-radius", csvPointRadius);
+			map.setPaintProperty("csv-points-outline", "circle-radius", csvPointRadius + 1);
+		}
+	};
+	csvRadiusSlider.addEventListener("calciteSliderInput", updateCsvPointRadius);
+	csvRadiusSlider.addEventListener("calciteSliderChange", updateCsvPointRadius);
+
 	const handleCsvFile = async (file) => {
+		const loadVersion = ++csvLoadVersion;
 		/*if (marker) {
 			marker.remove();
 			console.log(map.getLayer('predLayer_selection'));
@@ -415,6 +435,7 @@ const initMap = () => {
 				map.removeSource("csv-points");
 			}
 			console.log("Layer CSV rimosso");
+			syncCsvRadiusControl();
 			return;
 		}
 
@@ -423,12 +444,14 @@ const initMap = () => {
 
 			// 1) Leggi CSV → GeoJSON
 			const geojson = await readCSV(file);
+			if (loadVersion !== csvLoadVersion) return;
 			// 2) Costruisci locations
 			const locations = buildLocationsFromGeoJSON(geojson);
 			// 3) Chiamata API GetLocationInfo
 			let selected_year = document.querySelector("#year_slider").value;
 			let selected_timestampId = predLayer_timestampIds.find(item => String(item.description) === String(selected_year));
 			const getLocationInfoResult = await getLocationInfo(prediction_pathId, selected_timestampId.id, locations);
+			if (loadVersion !== csvLoadVersion) return;
 			console.log("getLocationInfo response:", getLocationInfoResult);
 
 			// 4) Aggiungi proprietà ai features del GeoJSON
@@ -473,7 +496,7 @@ const initMap = () => {
 					type: "circle",
 					source: "csv-points",
 					paint: {
-						"circle-radius": 6,
+						"circle-radius": csvPointRadius + 1,
 						"circle-color": "#ffffff"
 					}
 				});
@@ -484,7 +507,7 @@ const initMap = () => {
 					type: "circle",
 					source: "csv-points",
 					paint: {
-						"circle-radius": 5,
+						"circle-radius": csvPointRadius,
 						"circle-color": [
 							"match",
 							["get", unifiedAttrName],   // 👈 NOME DINAMICO DELL'ATTRIBUTO
@@ -581,8 +604,11 @@ const initMap = () => {
 			// Abilita il bottone per scaricare il dato arricchito
 			document.querySelector("#download_xlsx_btn").disabled = false;
 			document.querySelector("#download_geojson_btn").disabled = false;
+			syncCsvRadiusControl();
 
 		} catch (err) {
+			if (loadVersion !== csvLoadVersion) return;
+			syncCsvRadiusControl();
 			console.error(err);
 			alert(err);
 		}
@@ -603,7 +629,10 @@ const initMap = () => {
 
 	document.querySelector("#clear_csv_btn").addEventListener("click", () => {
 
+		// Ignore pending CSV results after clearing, without resetting the radius.
+		csvLoadVersion++;
 		uploadedFile = null;
+		processedCsvGeojson = null;
 
 		// Rimuovi i due layer se esistono
 		if (map.getLayer("csv-points")) {
@@ -617,6 +646,8 @@ const initMap = () => {
 		if (map.getSource("csv-points")) {
 			map.removeSource("csv-points");
 		}
+
+		syncCsvRadiusControl();
 
 		// Rimuovi l’eventuale marker cliccato
 		if (marker) {
